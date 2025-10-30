@@ -9,6 +9,11 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
@@ -70,7 +75,6 @@ jobs:
         
         STATUS="${{ steps.run_tests.outputs.status }}"
         sed -i "s/{{STATUS}}/$STATUS/g" index.html
-        sed -i "s/{{STATUS_TEXT}}/$([ "$STATUS" = "success" ] && echo '✅ ÉXITO' || echo '❌ FALLÓ')/g" index.html
         
         sed -i "s/{{TESTS_PASSED}}/${{ steps.run_tests.outputs.tests_passed }}/g" index.html
         sed -i "s/{{TESTS_FAILED}}/${{ steps.run_tests.outputs.tests_failed }}/g" index.html
@@ -82,8 +86,13 @@ jobs:
         sed -i "s|{{PASSED_LIST}}|$PASSED_HTML|" index.html
         sed -i "s|{{FAILED_LIST}}|$FAILED_HTML|" index.html
 
-    - name: Deploy a GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Configurar Pages
+      uses: actions/configure-pages@v3
+
+    - name: Subir artefacto
+      uses: actions/upload-pages-artifact@v2
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: .
+        path: .
+
+    - name: Deploy a GitHub Pages
+      uses: actions/deploy-pages@v2

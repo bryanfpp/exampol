@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PS 3.36 - La Granja</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
+        header h1 { margin: 0; }
+        main { padding: 30px; }
+        h2 { border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px; color: #333; }
+        .card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+        .card p, .card li { color: #444; line-height: 1.6; }
+        .card ul { padding-left: 20px; }
+        code { background: #eee; padding: 2px 5px; border-radius: 4px; font-family: 'Courier New', monospace; }
+        
+        .diagram-container {
+            background: #f9f9f9; border: 1px dashed #ccc;
+            padding: 20px; text-align: center; border-radius: 8px;
+        }
+        .diagram-container img { max-width: 100%; height: auto; }
+        .placeholder { color: #888; font-style: italic; }
+
+        .btn-probar {
+            background-color: #10b981; color: white; border: none;
+            padding: 12px 25px; font-size: 1em; font-weight: 600;
+            border-radius: 8px; cursor: pointer; transition: background-color 0.2s;
+        }
+        .btn-probar:hover { background-color: #059669; }
+        .terminal {
+            background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
+            padding: 20px; border-radius: 8px; margin-top: 20px;
+            white-space: pre-wrap; word-wrap: break-word;
+            display: none; /* Oculto por defecto */
+        }
+        .terminal.visible { display: block; }
+        .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
+        
+        .back-link { display: inline-block; margin-top: 20px; color: #667eea; text-decoration: none; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PS 3.36 - La Granja</h1>
+            <p>Analiza la producción anual de 5 productos de una granja.</p>
+        </header>
+
+        <main>
+            
+            <div class="card">
+                <h2>📝 Descripción del Problema</h2>
+                <p>
+                    Se lleva el registro de kilogramos producidos y precio por kg de 5 productos (tomates, lechuga, acelgas, zanahorias y chícharos) durante 12 meses.
+                </p>
+                <p><strong>Datos:</strong> 10 arreglos de 12 elementos cada uno (TOMi, PTOMi, LECi, PLECi, ...)</p>
+                <p>Se debe calcular:</p>
+                <ul>
+                    <li>a) ¿Producto que más kilogramos rindió al final del año?</li>
+                    <li>b) ¿Producción total (kg y dinero) de cada producto?</li>
+                    <li>c) ¿Producto que más dinero produjo al final del año?</li>
+                    <li>d) ¿Importe mensual total pagado a la granja?</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>💡 Pistas y Fórmulas Clave</h2>
+                <ul>
+                    <li>La clase principal debe llamarse <code>AnalizadorGranja.java</code>.</li>
+                    <li>Esta clase es compleja y debe recibir 10 arreglos en su constructor.</li>
+                    <li>Crea métodos auxiliares como <code>sumarArreglo(double[] arr)</code> y <code>calcularIngresoTotal(double[] kilos, double[] precios)</code> para reutilizar código.</li>
+                    <li>Para los incisos (a) y (c), usa un <code>Map&lt;String, Double&gt;</code> para guardar los totales de cada producto y luego encontrar el máximo.</li>
+                    <li>Para el inciso (b), puedes devolver un <code>Map&lt;String, Map&lt;String, Double&gt;&gt;</code> para un resultado estructurado.</li>
+                    <li>Para el inciso (d), necesitas un bucle de 1 a 12 (índices 0 a 11) y sumar el <code>kg[i] * precio[i]</code> de los 5 productos en cada iteración.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>📊 Diagrama de Flujo (Inciso A)</h2>
+                <div class="diagram-container">
+                    <img src="./diagramas/ps3_36.png" alt="Diagrama de flujo para PS 3.36 - Inciso A" 
+                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>▶️ Prueba y Resultados</h2>
+                <p>Resultado de ejecutar <code>--select-class TestAnalizadorGranja</code> en la terminal.</p>
+                
+                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
+                
+                <pre id="terminal-output" class="terminal">
+<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestAnalizadorGranja</span>
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+.
++-- JUnit Jupiter [OK]
+| '-- TestAnalizadorGranja [OK]
+|   +-- testIncisoD_ImportesMensuales() [OK]
+|   +-- testIncisoB_TotalesProduccion() [OK]
+|   +-- testIncisoC_ProductoMasDinero() [OK]
+|   '-- testIncisoA_ProductoMasKilos() [OK]
+'-- JUnit Platform Suite [OK]
+
+Test run finished after 112 ms
+[         3 containers found      ]
+[         0 containers skipped    ]
+[         3 containers started    ]
+[         0 containers aborted    ]
+[         3 containers successful ]
+[         0 containers failed     ]
+[         4 tests found           ]
+[         0 tests skipped         ]
+[         4 tests started         ]
+[         0 tests aborted         ]
+[         4 tests successful      ]
+[         0 tests failed          ]
+</pre>
+            </div>
+
+            <a href="index.html" class="back-link">← Volver al Inicio</a>
+        </main>
+    </div>
+
+    <script>
+        function mostrarTerminal() {
+            const terminal = document.getElementById('terminal-output');
+            terminal.classList.toggle('visible');
+        }
+    </script>
+</body>
+</html>

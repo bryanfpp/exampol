@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PS 3.35 - Ecuación (X, Y, Z)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
+        header h1 { margin: 0; }
+        main { padding: 30px; }
+        h2 { border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px; color: #333; }
+        .card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+        .card p, .card li { color: #444; line-height: 1.6; }
+        .card ul { padding-left: 20px; }
+        code { background: #eee; padding: 2px 5px; border-radius: 4px; font-family: 'Courier New', monospace; }
+        
+        .diagram-container {
+            background: #f9f9f9; border: 1px dashed #ccc;
+            padding: 20px; text-align: center; border-radius: 8px;
+        }
+        .diagram-container img { max-width: 100%; height: auto; }
+        .placeholder { color: #888; font-style: italic; }
+
+        .btn-probar {
+            background-color: #10b981; color: white; border: none;
+            padding: 12px 25px; font-size: 1em; font-weight: 600;
+            border-radius: 8px; cursor: pointer; transition: background-color 0.2s;
+        }
+        .btn-probar:hover { background-color: #059669; }
+        .terminal {
+            background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
+            padding: 20px; border-radius: 8px; margin-top: 20px;
+            white-space: pre-wrap; word-wrap: break-word;
+            display: none; /* Oculto por defecto */
+        }
+        .terminal.visible { display: block; }
+        .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
+        
+        .back-link { display: inline-block; margin-top: 20px; color: #667eea; text-decoration: none; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PS 3.35 - Ecuación (X, Y, Z)</h1>
+            <p>Imprime todos los tríos (X, Y, Z) que cumplan: 18X⁵ + 11Y⁵ + 8Z⁶ &lt; 6300</p>
+        </header>
+
+        <main>
+            
+            <div class="card">
+                <h2>📝 Descripción del Problema</h2>
+                <p>
+                    Escriba un diagrama de flujo que imprima todos los valores de X, Y y Z que satisfacen la siguiente expresión: <code>18*X⁵ + 11*Y⁵ + 8*Z⁶ &lt; 6300</code>.
+                </p>
+                <p><strong>Nota:</strong> X, Y y Z sólo pueden ser enteros positivos.</p>
+            </div>
+
+            <div class="card">
+                <h2>💡 Pistas y Fórmulas Clave</h2>
+                <ul>
+                    <li>La clase principal debe llamarse <code>EcuacionTrio.java</code>.</li>
+                    <li>Este problema requiere **tres bucles <code>while</code> anidados** (para X, Y, Z).</li>
+                    <li>Para las potencias, usa <code>Math.pow(base, exponente)</code>.</li>
+                    <li><b>Optimización:</b> Los bucles deben detenerse tan pronto como la condición (usando los valores mínimos para las variables internas) supere 6300.</li>
+                    <li>Ej: El bucle de <code>X</code> se detiene si <code>18*X⁵ + 11*(1)⁵ + 8*(1)⁶ >= 6300</code>.</li>
+                    <li>Para las pruebas, es útil que el método devuelva una <code>List&lt;Trio&gt;</code>, donde <code>Trio</code> es una clase auxiliar interna para guardar X, Y, Z.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>📊 Diagrama de Flujo</h2>
+                <div class="diagram-container">
+                    <img src="./diagramas/ps3_35.png" alt="Diagrama de flujo para PS 3.35" 
+                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>▶️ Prueba y Resultados</h2>
+                <p>Resultado de ejecutar <code>--select-class TestEcuacionTrio</code> en la terminal.</p>
+                
+                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
+                
+                <pre id="terminal-output" class="terminal">
+<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestEcuacionTrio</span>
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+.
++-- JUnit Jupiter [OK]
+| '-- TestEcuacionTrio [OK]
+|   +-- testLimiteDe_Z() [OK]
+|   +-- testLimiteDe_X

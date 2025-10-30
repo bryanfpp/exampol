@@ -1,0 +1,117 @@
+name: Java CI - Correr Pruebas de JUnit
+
+on:
+  push:
+    branches: [ main, master ] # Se activa al subir a main o master
+
+jobs:
+  test-and-generate-report:
+    runs-on: ubuntu-latest # Usará una máquina virtual con Linux
+
+    steps:
+      # 1. Descarga tu código al servidor
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necesario para obtener el historial de commits
+
+      # 2. Configura el entorno de Java (JDK 17)
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3. Obtiene información del commit (autor, mensaje, etc.)
+      - name: Obtener información del commit
+        id: commit_info
+        run: |
+          AUTHOR_NAME="${{ github.event.head_commit.author.name }}"
+          AUTHOR_EMAIL="${{ github.event.head_commit.author.email }}"
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          
+          echo "author_name=$AUTHOR_NAME" >> $GITHUB_OUTPUT
+          echo "author_email=$AUTHOR_EMAIL" >> $GITHUB_OUTPUT
+          echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+
+      # 4. Ejecuta las pruebas de JUnit 5
+      - name: Ejecutar Pruebas de JUnit 5
+        id: run_tests
+        continue-on-error: true # Continúa aunque los tests fallen
+        run: |
+          set +e # Desactivar exit-on-error temporalmente
+          echo "🧪 Ejecutando tests de Java..."
+          
+          # Ejecuta el runner y guarda TODA la salida en un archivo
+          java -jar lib/junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --scan-classpath > test_output.txt 2>&1
+          TEST_EXIT_CODE=$?
+          set -e # Reactivar exit-on-error
+
+          # Imprime la salida para el log de GitHub
+          cat test_output.txt
+          
+          # Parsea la salida de JUnit 5 para obtener los números
+          # (Busca líneas como "[       7 tests found      ]")
+          TOTAL=$(grep 'tests found' test_output.txt | awk '{print $2}')
+          PASSED=$(grep 'tests successful' test_output.txt | awk '{print $2}')
+          FAILED=$(grep 'tests failed' test_output.txt | awk '{print $2}')
+          
+          # Si no encuentra números, pone 0
+          TOTAL=${TOTAL:-0}
+          PASSED=${PASSED:-0}
+          FAILED=${FAILED:-0}
+
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "tests_passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
+          
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "✅ Todos los tests pasaron: $PASSED/$TOTAL"
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "❌ Tests fallidos: $FAILED/$TOTAL"
+          fi
+
+      # 5. Genera la página de resultados (test_results.html)
+      - name: Generar página de resultados HTML
+        run: |
+          # Copia tu plantilla HTML para crear la página de resultados
+          # (Necesitarás crear "template_reporte.html" en tu proyecto)
+          cp template_reporte.html test_results.html
+          
+          # Reemplaza los placeholders en el HTML con los valores reales
+          STATUS="${{ steps.run_tests.outputs.status }}"
+          AUTHOR="${{ steps.commit_info.outputs.author_name }}"
+          EMAIL="${{ steps.commit_info.outputs.author_email }}"
+          TIMESTAMP="${{ steps.commit_info.outputs.timestamp }}"
+          COMMIT_MSG="${{ steps.commit_info.outputs.commit_message }}"
+          COMMIT_NUM="${{ steps.commit_info.outputs.commit_count }}"
+          PASSED="${{ steps.run_tests.outputs.tests_passed }}"
+          TOTAL="${{ steps.run_tests.outputs.tests_total }}"
+          
+          sed -i "s/{{STATUS}}/$STATUS/g" test_results.html
+          sed -i 's|{{AUTHOR}}|'$AUTHOR'|g' test_results.html
+          sed -i 's|{{EMAIL}}|'$EMAIL'|g' test_results.html
+          sed -i 's|{{TIMESTAMP}}|'$TIMESTAMP'|g' test_results.html
+          sed -i 's|{{COMMIT_MESSAGE}}|'$COMMIT_MSG'|g' test_results.html
+          sed -i "s/{{COMMIT_COUNT}}/$COMMIT_NUM/g" test_results.html
+          sed -i "s/{{TESTS_PASSED}}/$PASSED/g" test_results.html
+          sed -i "s/{{TESTS_TOTAL}}/$TOTAL/g" test_results.html
+          
+          echo "✅ Página test_results.html generada."
+
+      # 6. Sube los artefactos (el reporte HTML y el log de la terminal)
+      - name: Subir Artefactos
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-de-pruebas-${{ github.run_number }}
+          path: |
+            test_results.html
+            test_output.txt
+          retention-days: 7 # Guarda los reportes por 7 días

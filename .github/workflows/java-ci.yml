@@ -47,13 +47,9 @@ jobs:
         echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
         echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
 
-        echo "passed_list<<EOF" >> $GITHUB_OUTPUT
-        echo "$PASSED_LIST" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-
-        echo "failed_list<<EOF" >> $GITHUB_OUTPUT
-        echo "$FAILED_LIST" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        # Guardar listas como variables temporales
+        echo "$PASSED_LIST" > passed.txt
+        echo "$FAILED_LIST" > failed.txt
 
     - name: Obtener datos del commit
       id: commit_info
@@ -64,41 +60,27 @@ jobs:
         echo "count=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
         echo "time=$(date)" >> $GITHUB_OUTPUT
 
-    - name: Rellenar HTML seguro
+    - name: Reemplazar placeholders en HTML
       run: |
-        TMP_HTML="index_tmp.html"
-
         STATUS="${{ steps.run_tests.outputs.status }}"
-        STATUS_TEXT=$([ "$STATUS" = "success" ] && echo "✅ TODOS LOS TESTS PASARON" || echo "❌ HAY TESTS FALLIDOS")
+        sed -i "s/{{STATUS}}/$STATUS/g" index.html
+        sed -i "s/{{STATUS_TEXT}}/$([ "$STATUS" = "success" ] && echo '✅ TODOS LOS TESTS PASARON' || echo '❌ HAY TESTS FALLIDOS')/g" index.html
+        sed -i "s/{{AUTHOR}}/${{ steps.commit_info.outputs.author }}/g" index.html
+        sed -i "s/{{EMAIL}}/${{ steps.commit_info.outputs.email }}/g" index.html
+        sed -i "s/{{TIMESTAMP}}/${{ steps.commit_info.outputs.time }}/g" index.html
+        sed -i "s/{{COMMIT_COUNT}}/${{ steps.commit_info.outputs.count }}/g" index.html
+        sed -i "s/{{COMMIT_MESSAGE}}/${{ steps.commit_info.outputs.message }}/g" index.html
+        sed -i "s/{{TESTS_PASSED}}/${{ steps.run_tests.outputs.tests_passed }}/g" index.html
+        sed -i "s/{{TESTS_FAILED}}/${{ steps.run_tests.outputs.tests_failed }}/g" index.html
+        sed -i "s/{{TESTS_TOTAL}}/${{ steps.run_tests.outputs.tests_total }}/g" index.html
 
-        PASSED_HTML=$(echo "${{ steps.run_tests.outputs.passed_list }}" | sed 's/.*/<li class="pass">&<\/li>/')
-        FAILED_HTML=$(echo "${{ steps.run_tests.outputs.failed_list }}" | sed 's/.*/<li class="fail">&<\/li>/')
+        # Reemplazar listas
+        PASSED_HTML=$(awk '{print "<li class=\"pass\">" $0 "</li>"}' passed.txt | tr '\n' ' ')
+        FAILED_HTML=$(awk '{print "<li class=\"fail\">" $0 "</li>"}' failed.txt | tr '\n' ' ')
+        sed -i "s|{{PASSED_LIST}}|$PASSED_HTML|" index.html
+        sed -i "s|{{FAILED_LIST}}|$FAILED_HTML|" index.html
 
-        # Escapar caracteres especiales
-        AUTHOR_ESC=$(printf '%s\n' "${{ steps.commit_info.outputs.author }}" | sed 's/[&/\]/\\&/g')
-        EMAIL_ESC=$(printf '%s\n' "${{ steps.commit_info.outputs.email }}" | sed 's/[&/\]/\\&/g')
-        MSG_ESC=$(printf '%s\n' "${{ steps.commit_info.outputs.message }}" | sed 's/[&/\]/\\&/g')
-        PASSED_HTML_ESC=$(printf '%s\n' "$PASSED_HTML" | sed 's/[&/\]/\\&/g')
-        FAILED_HTML_ESC=$(printf '%s\n' "$FAILED_HTML" | sed 's/[&/\]/\\&/g')
-
-        sed \
-          -e "s|{{STATUS_TEXT}}|$STATUS_TEXT|g" \
-          -e "s|{{STATUS}}|$STATUS|g" \
-          -e "s|{{AUTHOR}}|$AUTHOR_ESC|g" \
-          -e "s|{{EMAIL}}|$EMAIL_ESC|g" \
-          -e "s|{{COMMIT_MESSAGE}}|$MSG_ESC|g" \
-          -e "s|{{COMMIT_COUNT}}|${{ steps.commit_info.outputs.count }}|g" \
-          -e "s|{{TIMESTAMP}}|${{ steps.commit_info.outputs.time }}|g" \
-          -e "s|{{TESTS_PASSED}}|${{ steps.run_tests.outputs.tests_passed }}|g" \
-          -e "s|{{TESTS_FAILED}}|${{ steps.run_tests.outputs.tests_failed }}|g" \
-          -e "s|{{TESTS_TOTAL}}|${{ steps.run_tests.outputs.tests_total }}|g" \
-          -e "s|{{PASSED_LIST}}|$PASSED_HTML_ESC|g" \
-          -e "s|{{FAILED_LIST}}|$FAILED_HTML_ESC|g" \
-          index.html > $TMP_HTML
-
-        mv $TMP_HTML index.html
-
-    - name: Subir archivo para Pages
+    - name: Subir archivo a GitHub Pages
       uses: actions/upload-pages-artifact@v3
       with:
         path: .

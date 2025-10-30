@@ -81,11 +81,9 @@ jobs:
       # 5. Genera la página de resultados (test_results.html)
       - name: Generar página de resultados HTML
         run: |
-          # Copia tu plantilla HTML para crear la página de resultados
-          # (Necesitarás crear "template_reporte.html" en tu proyecto)
           cp template_reporte.html test_results.html
           
-          # Reemplaza los placeholders en el HTML con los valores reales
+          # --- OBTENER VARIABLES ---
           STATUS="${{ steps.run_tests.outputs.status }}"
           AUTHOR="${{ steps.commit_info.outputs.author_name }}"
           EMAIL="${{ steps.commit_info.outputs.author_email }}"
@@ -94,12 +92,21 @@ jobs:
           COMMIT_NUM="${{ steps.commit_info.outputs.commit_count }}"
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
-          
+
+          # --- ESCAPAR VARIABLES PARA SED ---
+          # ¡ESTA ES LA CORRECCIÓN!
+          # Escapa caracteres que rompen sed ('|', '\', '/', '&')
+          AUTHOR_ESC=$(echo "$AUTHOR" | sed 's/[|/&\\]/\\&/g')
+          EMAIL_ESC=$(echo "$EMAIL" | sed 's/[|/&\\]/\\&/g')
+          COMMIT_MSG_ESC=$(echo "$COMMIT_MSG" | sed 's/[|/&\\]/\\&/g')
+
+          # --- APLICAR REEMPLAZOS ---
+          # Ahora usamos las variables escapadas (ej. $AUTHOR_ESC)
           sed -i "s/{{STATUS}}/$STATUS/g" test_results.html
-          sed -i 's|{{AUTHOR}}|'$AUTHOR'|g' test_results.html
-          sed -i 's|{{EMAIL}}|'$EMAIL'|g' test_results.html
+          sed -i 's|{{AUTHOR}}|'$AUTHOR_ESC'|g' test_results.html
+          sed -i 's|{{EMAIL}}|'$EMAIL_ESC'|g' test_results.html
           sed -i 's|{{TIMESTAMP}}|'$TIMESTAMP'|g' test_results.html
-          sed -i 's|{{COMMIT_MESSAGE}}|'$COMMIT_MSG'|g' test_results.html
+          sed -i 's|{{COMMIT_MESSAGE}}|'$COMMIT_MSG_ESC'|g' test_results.html
           sed -i "s/{{COMMIT_COUNT}}/$COMMIT_NUM/g" test_results.html
           sed -i "s/{{TESTS_PASSED}}/$PASSED/g" test_results.html
           sed -i "s/{{TESTS_TOTAL}}/$TOTAL/g" test_results.html

@@ -39,39 +39,66 @@ jobs:
         FAILED=$(grep -c "FAILED" test_output.txt || echo "0")
         TOTAL=$((PASSED + FAILED))
 
-        PASSED_LIST=$(grep "PASSED" test_output.txt | sed 's/::/ - /' | sed 's/^/<li class="pass">/' | sed 's/$/<\/li>/')
-        FAILED_LIST=$(grep "FAILED" test_output.txt | sed 's/::/ - /' | sed 's/^/<li class="fail">/' | sed 's/$/<\/li>/')
+        PASSED_LIST=$(grep "PASSED" test_output.txt | sed 's/::/ - /')
+        FAILED_LIST=$(grep "FAILED" test_output.txt | sed 's/::/ - /')
 
-        STATUS=$([ $EXIT -eq 0 ] && echo success || echo failed)
-        STATUS_TEXT=$([ $EXIT -eq 0 ] && echo "✅ TODOS LOS TESTS PASARON" || echo "❌ HAY TESTS FALLIDOS")
+        echo "status=$([ $EXIT -eq 0 ] && echo success || echo failed)" >> $GITHUB_OUTPUT
+        echo "tests_passed=$PASSED" >> $GITHUB_OUTPUT
+        echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
+        echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
 
-        # Exportar variables para envsubst
-        export STATUS
-        export STATUS_TEXT
-        export STATUS_CLASS=$STATUS
-        export PASSED_LIST
-        export FAILED_LIST
-        export TESTS_PASSED=$PASSED
-        export TESTS_FAILED=$FAILED
-        export TESTS_TOTAL=$TOTAL
+        echo "passed_list<<EOF" >> $GITHUB_OUTPUT
+        echo "$PASSED_LIST" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+        echo "failed_list<<EOF" >> $GITHUB_OUTPUT
+        echo "$FAILED_LIST" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Obtener datos del commit
       id: commit_info
       run: |
-        export AUTHOR="$(git log -1 --pretty=format:'%an')"
-        export EMAIL="$(git log -1 --pretty=format:'%ae')"
-        export COMMIT_MESSAGE="$(git log -1 --pretty=format:'%s')"
-        export COMMIT_COUNT=$(git rev-list --count HEAD)
-        export TIMESTAMP="$(date)"
+        echo "author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_OUTPUT
+        echo "email=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_OUTPUT
+        echo "message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_OUTPUT
+        echo "count=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
+        echo "time=$(date)" >> $GITHUB_OUTPUT
 
     - name: Generar index.html desde template
       run: |
-        envsubst < template_reporte.html > index.html
+        cp template_reporte.html index.html
 
-    - name: Publicar en GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+        STATUS="${{ steps.run_tests.outputs.status }}"
+        STATUS_TEXT=$([ "$STATUS" = "success" ] && echo '✅ TODOS LOS TESTS PASARON' || echo '❌ HAY TESTS FALLIDOS')
+
+        sed -i "s|{{STATUS}}|$STATUS|g" index.html
+        sed -i "s|{{STATUS_TEXT}}|$STATUS_TEXT|g" index.html
+        sed -i "s|{{AUTHOR}}|${{ steps.commit_info.outputs.author }}|g" index.html
+        sed -i "s|{{EMAIL}}|${{ steps.commit_info.outputs.email }}|g" index.html
+        sed -i "s|{{TIMESTAMP}}|${{ steps.commit_info.outputs.time }}|g" index.html
+        sed -i "s|{{COMMIT_COUNT}}|${{ steps.commit_info.outputs.count }}|g" index.html
+        sed -i "s|{{COMMIT_MESSAGE}}|${{ steps.commit_info.outputs.message }}|g" index.html
+        sed -i "s|{{TESTS_PASSED}}|${{ steps.run_tests.outputs.tests_passed }}|g" index.html
+        sed -i "s|{{TESTS_FAILED}}|${{ steps.run_tests.outputs.tests_failed }}|g" index.html
+        sed -i "s|{{TESTS_TOTAL}}|${{ steps.run_tests.outputs.tests_total }}|g" index.html
+
+        PASSED_HTML=$(echo "${{ steps.run_tests.outputs.passed_list }}" | sed 's/.*/<li class="pass">&<\/li>/')
+        FAILED_HTML=$(echo "${{ steps.run_tests.outputs.failed_list }}" | sed 's/.*/<li class="fail">&<\/li>/')
+
+        sed -i "s|{{PASSED_LIST}}|$PASSED_HTML|g" index.html
+        sed -i "s|{{FAILED_LIST}}|$FAILED_HTML|g" index.html
+
+    - name: Subir archivo para GitHub Pages
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: .
-        # Ignora el template
-        exclude_assets: template_reporte.html
+        path: .
+        exclude: template_reporte.html
+
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
+      with:
+        token: ${{ secrets.GH_PAT }}

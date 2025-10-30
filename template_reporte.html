@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-R">
 <title>Resultados del Ejercicio OOP - Person</title>
 <style>
 body {
@@ -29,6 +29,7 @@ body {
     font-size: 1.2em;
     display: inline-block;
 }
+/* Tu CSS tiene .success y .failed, que coincide con el output 'status' */
 .success { background: #10b981; }
 .failed { background: #ef4444; }
 
@@ -50,8 +51,7 @@ h2 { margin-top: 30px; }
 
     <h2>👨‍💻 Información</h2>
     <p><b>Nombre:</b> $AUTHOR</p>
-    <p><b>Email:</b> $EMAIL</p>
-    <p><b>Fecha:</b> $TIMESTAMP</p>
+    <p><b>Email:</b> $EMAIL</p> <p><b>Fecha:</b> $TIMESTAMP</p>
     <p><b>Commit #:</b> $COMMIT_COUNT</p>
     <p><b>Mensaje:</b> "$COMMIT_MESSAGE"</p>
 
@@ -61,13 +61,11 @@ h2 { margin-top: 30px; }
 
     <h2>✅ Tests Pasados</h2>
     <ul>
-        $PASSED_LIST
-    </ul>
+        $PASSED_LIST </ul>
 
     <h2>❌ Tests Fallados</h2>
     <ul>
-        $FAILED_LIST
-    </ul>
+        $FAILED_LIST </ul>
 </div>
 </body>
 </html>

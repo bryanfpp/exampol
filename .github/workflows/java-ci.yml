@@ -5,6 +5,7 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Permisos generales para el workflow
 permissions:
   contents: read
   pages: write
@@ -28,13 +29,14 @@ jobs:
 
     - name: Ejecutar tests
       id: run_tests
-      continue-on-error: true
+      continue-on-error: true # Continuar aunque fallen para poder reportar
       run: |
         set +e
         python -m pytest tests/test_person.py -v --tb=no > test_output.txt 2>&1
         EXIT=$?
         set -e
 
+        # Esta lógica de parseo es frágil, pero se mantiene de tu original
         PASSED=$(grep -c "PASSED" test_output.txt || echo "0")
         FAILED=$(grep -c "FAILED" test_output.txt || echo "0")
         TOTAL=$((PASSED + FAILED))
@@ -59,39 +61,81 @@ jobs:
       id: commit_info
       run: |
         echo "author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_OUTPUT
+        echo "email=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_OUTPUT # <-- AÑADIDO: Faltaba el email
         echo "message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_OUTPUT
         echo "count=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
         echo "time=$(date)" >> $GITHUB_OUTPUT
 
     - name: Rellenar HTML
+      # Usar 'env' es más limpio y seguro para pasar variables al script
+      env:
+        AUTHOR: "${{ steps.commit_info.outputs.author }}"
+        EMAIL: "${{ steps.commit_info.outputs.email }}"
+        COMMIT_MESSAGE: "${{ steps.commit_info.outputs.message }}"
+        COMMIT_COUNT: "${{ steps.commit_info.outputs.count }}"
+        TIMESTAMP: "${{ steps.commit_info.outputs.time }}"
+        TESTS_PASSED: "${{ steps.run_tests.outputs.tests_passed }}"
+        TESTS_FAILED: "${{ steps.run_tests.outputs.tests_failed }}"
+        TESTS_TOTAL: "${{ steps.run_tests.outputs.tests_total }}"
+        STATUS: "${{ steps.run_tests.outputs.status }}"
+        PASSED_LIST_DATA: "${{ steps.run_tests.outputs.passed_list }}"
+        FAILED_LIST_DATA: "${{ steps.run_tests.outputs.failed_list }}"
       run: |
-        sed -i "s/{{AUTHOR}}/${{ steps.commit_info.outputs.author }}/g" index.html
-        sed -i "s/{{COMMIT_MESSAGE}}/${{ steps.commit_info.outputs.message }}/g" index.html
-        sed -i "s/{{COMMIT_COUNT}}/${{ steps.commit_info.outputs.count }}/g" index.html
-        sed -i "s/{{TIMESTAMP}}/${{ steps.commit_info.outputs.time }}/g" index.html
-        
-        sed -i "s/{{TESTS_PASSED}}/${{ steps.run_tests.outputs.tests_passed }}/g" index.html
-        sed -i "s/{{TESTS_FAILED}}/${{ steps.run_tests.outputs.tests_failed }}/g" index.html
-        sed -i "s/{{TESTS_TOTAL}}/${{ steps.run_tests.outputs.tests_total }}/g" index.html
+        # 1. Reemplazos simples
+        # Usamos '|' como delimitador sed por si los mensajes tienen '/'
+        # Escapamos el '$' del placeholder para que sed lo interprete literalmente
+        sed -i "s|\$AUTHOR|$AUTHOR|g" index.html
+        sed -i "s|\$EMAIL|$EMAIL|g" index.html
+        sed -i "s|\$COMMIT_MESSAGE|$COMMIT_MESSAGE|g" index.html
+        sed -i "s|\$COMMIT_COUNT|$COMMIT_COUNT|g" index.html
+        sed -i "s|\$TIMESTAMP|$TIMESTAMP|g" index.html
 
-        STATUS="${{ steps.run_tests.outputs.status }}"
-        sed -i "s/{{STATUS}}/$STATUS/g" index.html
-        sed -i "s/{{STATUS_TEXT}}/$([ "$STATUS" = "success" ] && echo '✅ ÉXITO' || echo '❌ FALLÓ')/g" index.html
-        
-        PASSED_HTML=$(echo "${{ steps.run_tests.outputs.passed_list }}" | sed 's/.*/<li class=\"pass\">&<\/li>/')
-        FAILED_HTML=$(echo "${{ steps.run_tests.outputs.failed_list }}" | sed 's/.*/<li class=\"fail\">&<\/li>/')
+        sed -i "s|\$TESTS_PASSED|$TESTS_PASSED|g" index.html
+        sed -i "s|\$TESTS_FAILED|$TESTS_FAILED|g" index.html
+        sed -i "s|\$TESTS_TOTAL|$TESTS_TOTAL|g" index.html
 
-        sed -i "s|{{PASSED_LIST}}|$PASSED_HTML|" index.html
-        sed -i "s|{{FAILED_LIST}}|$FAILED_HTML|" index.html
+        # 2. Reemplazos condicionales (Estado)
+        STATUS_TEXT=$([ "$STATUS" = "success" ] && echo '✅ ÉXITO' || echo '❌ FALLÓ')
+        sed -i "s|\$STATUS_CLASS|$STATUS|g" index.html
+        sed -i "s|\$STATUS_TEXT|$STATUS_TEXT|g" index.html
 
+        # 3. Reemplazo robusto de múltiples líneas
+        # Convertir las listas de texto plano a snippets de HTML
+        printf "%s" "$PASSED_LIST_DATA" | sed 's/.*/<li class=\"pass\">&<\/li>/' > passed_list.html
+        printf "%s" "$FAILED_LIST_DATA" | sed 's/.*/<li class=\"fail\">&<\/li>/' > failed_list.html
+
+        # Usar el comando 'r' (read file) de sed para insertar el contenido
+        sed -i "/\$PASSED_LIST/r passed_list.html" index.html
+        sed -i "/\$FAILED_LIST/r failed_list.html" index.html
+
+        # Eliminar las líneas de placeholder originales
+        sed -i "/\$PASSED_LIST/d" index.html
+        sed -i "/\$FAILED_LIST/d" index.html
+
+    - name: Preparar artefacto para Pages
+      run: |
+        mkdir -p _site
+        mv index.html _site/
+        # Mover otros assets (CSS, JS) aquí si los tuvieras
+    
     - name: Subir archivo para Pages
       uses: actions/upload-pages-artifact@v3
       with:
-        path: .
+        path: _site # <-- CAMBIADO: Subir solo la carpeta preparada
 
   deploy:
-    needs: tests
+    needs: tests # Depende de que el job de tests termine
+    
+    # Añadir permisos y entorno para el deploy
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # URL de la página desplegada
+      
     runs-on: ubuntu-latest
     steps:
-    - name: Deploy to GitHub Pages
-      uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment # Dar un ID al step
+        uses: actions/deploy-pages@v4

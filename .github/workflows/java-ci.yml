@@ -11,15 +11,12 @@ permissions:
   id-token: write
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Instalar Python
-      uses: actions/setup-python@v5
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
@@ -30,64 +27,42 @@ jobs:
       id: run_tests
       continue-on-error: true
       run: |
-        set +e
-        python -m pytest tests/test_person.py -v --tb=no > test_output.txt 2>&1
-        EXIT=$?
-        set -e
-
+        python -m pytest tests/test_person.py -v --tb=no > test_output.txt 2>&1 || true
         PASSED=$(grep -c "PASSED" test_output.txt || echo "0")
         FAILED=$(grep -c "FAILED" test_output.txt || echo "0")
         TOTAL=$((PASSED + FAILED))
+        PASSED_LIST=$(grep "PASSED" test_output.txt | sed 's/::/ - /' | sed 's/^/<li class="pass">/' | sed 's/$/<\/li>/')
+        FAILED_LIST=$(grep "FAILED" test_output.txt | sed 's/::/ - /' | sed 's/^/<li class="fail">/' | sed 's/$/<\/li>/')
+        STATUS=$([ $FAILED -eq 0 ] && echo success || echo failed)
+        STATUS_TEXT=$([ $FAILED -eq 0 ] && echo '✅ TODOS LOS TESTS PASARON' || echo '❌ HAY TESTS FALLIDOS')
+        echo "PASSED=$PASSED" >> $GITHUB_ENV
+        echo "FAILED=$FAILED" >> $GITHUB_ENV
+        echo "TOTAL=$TOTAL" >> $GITHUB_ENV
+        echo "PASSED_LIST=$PASSED_LIST" >> $GITHUB_ENV
+        echo "FAILED_LIST=$FAILED_LIST" >> $GITHUB_ENV
+        echo "STATUS=$STATUS" >> $GITHUB_ENV
+        echo "STATUS_TEXT=$STATUS_TEXT" >> $GITHUB_ENV
 
-        PASSED_LIST=$(grep "PASSED" test_output.txt | sed 's/::/ - /')
-        FAILED_LIST=$(grep "FAILED" test_output.txt | sed 's/::/ - /')
-
-        echo "status=$([ $EXIT -eq 0 ] && echo success || echo failed)" >> $GITHUB_OUTPUT
-        echo "tests_passed=$PASSED" >> $GITHUB_OUTPUT
-        echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
-        echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
-
-        # Guardar listas como variables temporales
-        echo "$PASSED_LIST" > passed.txt
-        echo "$FAILED_LIST" > failed.txt
-
-    - name: Obtener datos del commit
-      id: commit_info
+    - name: Obtener info del commit
       run: |
-        echo "author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_OUTPUT
-        echo "email=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_OUTPUT
-        echo "message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_OUTPUT
-        echo "count=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
-        echo "time=$(date)" >> $GITHUB_OUTPUT
+        echo "AUTHOR=$(git log -1 --pretty=format:'%an')" >> $GITHUB_ENV
+        echo "EMAIL=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_ENV
+        echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
+        echo "COMMIT_COUNT=$(git rev-list --count HEAD)" >> $GITHUB_ENV
+        echo "TIMESTAMP=$(date)" >> $GITHUB_ENV
 
-    - name: Reemplazar placeholders en HTML
+    - name: Generar HTML final
       run: |
-        STATUS="${{ steps.run_tests.outputs.status }}"
-        sed -i "s/{{STATUS}}/$STATUS/g" index.html
-        sed -i "s/{{STATUS_TEXT}}/$([ "$STATUS" = "success" ] && echo '✅ TODOS LOS TESTS PASARON' || echo '❌ HAY TESTS FALLIDOS')/g" index.html
-        sed -i "s/{{AUTHOR}}/${{ steps.commit_info.outputs.author }}/g" index.html
-        sed -i "s/{{EMAIL}}/${{ steps.commit_info.outputs.email }}/g" index.html
-        sed -i "s/{{TIMESTAMP}}/${{ steps.commit_info.outputs.time }}/g" index.html
-        sed -i "s/{{COMMIT_COUNT}}/${{ steps.commit_info.outputs.count }}/g" index.html
-        sed -i "s/{{COMMIT_MESSAGE}}/${{ steps.commit_info.outputs.message }}/g" index.html
-        sed -i "s/{{TESTS_PASSED}}/${{ steps.run_tests.outputs.tests_passed }}/g" index.html
-        sed -i "s/{{TESTS_FAILED}}/${{ steps.run_tests.outputs.tests_failed }}/g" index.html
-        sed -i "s/{{TESTS_TOTAL}}/${{ steps.run_tests.outputs.tests_total }}/g" index.html
+        envsubst < template.html > index.html
 
-        # Reemplazar listas
-        PASSED_HTML=$(awk '{print "<li class=\"pass\">" $0 "</li>"}' passed.txt | tr '\n' ' ')
-        FAILED_HTML=$(awk '{print "<li class=\"fail\">" $0 "</li>"}' failed.txt | tr '\n' ' ')
-        sed -i "s|{{PASSED_LIST}}|$PASSED_HTML|" index.html
-        sed -i "s|{{FAILED_LIST}}|$FAILED_HTML|" index.html
-
-    - name: Subir archivo a GitHub Pages
+    - name: Subir artifact para Pages
       uses: actions/upload-pages-artifact@v3
       with:
         path: .
 
   deploy:
-    needs: tests
+    needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Deploy to GitHub Pages
+    - name: Deploy a GitHub Pages
       uses: actions/deploy-pages@v4

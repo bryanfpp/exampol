@@ -67,11 +67,10 @@ h2 { margin-top: 30px; }
 </div>
 
 <script>
-    // Valores reemplazados desde GitHub Actions
+    // Reemplazo dinámico desde GitHub Actions
     const status = '{{STATUS}}';
-    const statusText = status === 'success' ? '✅ TODOS LOS TESTS PASARON' : '❌ HAY TESTS FALLIDOS';
     const badge = document.getElementById('statusBadge');
-    badge.textContent = statusText;
+    badge.textContent = status === 'success' ? '✅ TODOS LOS TESTS PASARON' : '❌ HAY TESTS FALLIDOS';
     badge.classList.add(status === 'success' ? 'success' : 'failed');
 
     document.getElementById('author').textContent = '{{AUTHOR}}';

@@ -32,11 +32,7 @@ body {
 .success { background: #10b981; }
 .failed { background: #ef4444; }
 
-ul {
-    padding-left: 20px;
-    margin-top: 10px;
-}
-
+ul { padding-left: 20px; margin-top: 10px; }
 .pass { color: #10b981; font-weight: bold; }
 .fail { color: #ef4444; font-weight: bold; }
 
@@ -48,35 +44,50 @@ h2 { margin-top: 30px; }
     <h1>🎓 Ejercicio OOP — Person</h1>
     <p>Resultados automáticos del test</p>
 
-    <div class="status-badge {{STATUS}}">
-        {{STATUS_TEXT}}
+    <div id="statusBadge" class="status-badge">
+        <!-- Badge dinámico -->
     </div>
 
     <h2>👨‍💻 Información</h2>
-    <p><b>Nombre:</b> {{AUTHOR}}</p>
-    <p><b>Email:</b> {{EMAIL}}</p>
-    <p><b>Fecha:</b> {{TIMESTAMP}}</p>
-    <p><b>Commit #:</b> {{COMMIT_COUNT}}</p>
-    <p><b>Mensaje:</b> "{{COMMIT_MESSAGE}}"</p>
+    <p><b>Nombre:</b> <span id="author"></span></p>
+    <p><b>Email:</b> <span id="email"></span></p>
+    <p><b>Fecha:</b> <span id="timestamp"></span></p>
+    <p><b>Commit #:</b> <span id="commitNum"></span></p>
+    <p><b>Mensaje:</b> "<span id="commitMsg"></span>"</p>
 
     <h2>📊 Resultados</h2>
-    <p><b>Tests pasados:</b> {{TESTS_PASSED}} / {{TESTS_TOTAL}}</p>
-    <p><b>Tests fallados:</b> {{TESTS_FAILED}}</p>
+    <p><b>Tests pasados:</b> <span id="testsPassed"></span> / <span id="testsTotal"></span></p>
+    <p><b>Tests fallados:</b> <span id="testsFailed"></span></p>
 
     <h2>✅ Tests Pasados</h2>
-    <ul>
-        {{PASSED_LIST}}
-    </ul>
+    <ul id="passedList"></ul>
 
     <h2>❌ Tests Fallados</h2>
-    <ul>
-        {{FAILED_LIST}}
-    </ul>
-
+    <ul id="failedList"></ul>
 </div>
 
 <script>
-// Badge dynamic text
+    // Valores reemplazados desde GitHub Actions
+    const status = '{{STATUS}}';
+    const statusText = status === 'success' ? '✅ TODOS LOS TESTS PASARON' : '❌ HAY TESTS FALLIDOS';
+    const badge = document.getElementById('statusBadge');
+    badge.textContent = statusText;
+    badge.classList.add(status === 'success' ? 'success' : 'failed');
+
+    document.getElementById('author').textContent = '{{AUTHOR}}';
+    document.getElementById('email').textContent = '{{EMAIL}}';
+    document.getElementById('timestamp').textContent = '{{TIMESTAMP}}';
+    document.getElementById('commitNum').textContent = '{{COMMIT_COUNT}}';
+    document.getElementById('commitMsg').textContent = '{{COMMIT_MESSAGE}}';
+    document.getElementById('testsPassed').textContent = '{{TESTS_PASSED}}';
+    document.getElementById('testsFailed').textContent = '{{TESTS_FAILED}}';
+    document.getElementById('testsTotal').textContent = '{{TESTS_TOTAL}}';
+
+    const passedList = `{{PASSED_LIST}}`.split('\n').filter(l => l).map(l => `<li class="pass">${l}</li>`).join('');
+    const failedList = `{{FAILED_LIST}}`.split('\n').filter(l => l).map(l => `<li class="fail">${l}</li>`).join('');
+
+    document.getElementById('passedList').innerHTML = passedList;
+    document.getElementById('failedList').innerHTML = failedList;
 </script>
 </body>
 </html>

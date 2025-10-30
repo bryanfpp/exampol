@@ -6,23 +6,20 @@ on:
 
 jobs:
   test-and-generate-report:
-    runs-on: ubuntu-latest # Usará una máquina virtual con Linux
+    runs-on: ubuntu-latest
 
     steps:
-      # 1. Descarga tu código al servidor
       - name: Descargar el repositorio
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necesario para obtener el historial de commits
+          fetch-depth: 0
 
-      # 2. Configura el entorno de Java (JDK 17)
       - name: Configurar Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3. Obtiene información del commit (autor, mensaje, etc.)
       - name: Obtener información del commit
         id: commit_info
         run: |
@@ -38,29 +35,22 @@ jobs:
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
           echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
 
-      # 4. Ejecuta las pruebas de JUnit 5
       - name: Ejecutar Pruebas de JUnit 5
         id: run_tests
-        continue-on-error: true # Continúa aunque los tests fallen
+        continue-on-error: true
         run: |
-          set +e # Desactivar exit-on-error temporalmente
+          set +e
           echo "🧪 Ejecutando tests de Java..."
-          
-          # Ejecuta el runner y guarda TODA la salida en un archivo
           java -jar lib/junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --scan-classpath > test_output.txt 2>&1
           TEST_EXIT_CODE=$?
-          set -e # Reactivar exit-on-error
+          set -e
 
-          # Imprime la salida para el log de GitHub
           cat test_output.txt
-          
-          # Parsea la salida de JUnit 5 para obtener los números
-          # (Busca líneas como "[       7 tests found      ]")
+
           TOTAL=$(grep 'tests found' test_output.txt | awk '{print $2}')
           PASSED=$(grep 'tests successful' test_output.txt | awk '{print $2}')
           FAILED=$(grep 'tests failed' test_output.txt | awk '{print $2}')
           
-          # Si no encuentra números, pone 0
           TOTAL=${TOTAL:-0}
           PASSED=${PASSED:-0}
           FAILED=${FAILED:-0}
@@ -78,12 +68,10 @@ jobs:
             echo "❌ Tests fallidos: $FAILED/$TOTAL"
           fi
 
-      # 5. Genera la página de resultados (test_results.html)
       - name: Generar página de resultados HTML
         run: |
           cp template_reporte.html test_results.html
           
-          # --- OBTENER VARIABLES ---
           STATUS="${{ steps.run_tests.outputs.status }}"
           AUTHOR="${{ steps.commit_info.outputs.author_name }}"
           EMAIL="${{ steps.commit_info.outputs.author_email }}"
@@ -93,27 +81,24 @@ jobs:
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
 
-          # --- ESCAPAR VARIABLES PARA SED ---
-          # ¡ESTA ES LA CORRECCIÓN!
-          # Escapa caracteres que rompen sed ('|', '\', '/', '&')
+          # Escapar caracteres que rompen sed
           AUTHOR_ESC=$(echo "$AUTHOR" | sed 's/[|/&\\]/\\&/g')
           EMAIL_ESC=$(echo "$EMAIL" | sed 's/[|/&\\]/\\&/g')
           COMMIT_MSG_ESC=$(echo "$COMMIT_MSG" | sed 's/[|/&\\]/\\&/g')
+          TIMESTAMP_ESC=$(echo "$TIMESTAMP" | sed 's/[|/&\\]/\\&/g')
 
-          # --- APLICAR REEMPLAZOS ---
-          # Ahora usamos las variables escapadas (ej. $AUTHOR_ESC)
-          sed -i "s/{{STATUS}}/$STATUS/g" test_results.html
-          sed -i 's|{{AUTHOR}}|'$AUTHOR_ESC'|g' test_results.html
-          sed -i 's|{{EMAIL}}|'$EMAIL_ESC'|g' test_results.html
-          sed -i 's|{{TIMESTAMP}}|'$TIMESTAMP'|g' test_results.html
-          sed -i 's|{{COMMIT_MESSAGE}}|'$COMMIT_MSG_ESC'|g' test_results.html
-          sed -i "s/{{COMMIT_COUNT}}/$COMMIT_NUM/g" test_results.html
-          sed -i "s/{{TESTS_PASSED}}/$PASSED/g" test_results.html
-          sed -i "s/{{TESTS_TOTAL}}/$TOTAL/g" test_results.html
+          # Reemplazos usando siempre | como delimitador
+          sed -i "s|{{STATUS}}|$STATUS|g" test_results.html
+          sed -i "s|{{AUTHOR}}|$AUTHOR_ESC|g" test_results.html
+          sed -i "s|{{EMAIL}}|$EMAIL_ESC|g" test_results.html
+          sed -i "s|{{TIMESTAMP}}|$TIMESTAMP_ESC|g" test_results.html
+          sed -i "s|{{COMMIT_MESSAGE}}|$COMMIT_MSG_ESC|g" test_results.html
+          sed -i "s|{{COMMIT_COUNT}}|$COMMIT_NUM|g" test_results.html
+          sed -i "s|{{TESTS_PASSED}}|$PASSED|g" test_results.html
+          sed -i "s|{{TESTS_TOTAL}}|$TOTAL|g" test_results.html
           
           echo "✅ Página test_results.html generada."
 
-      # 6. Sube los artefactos (el reporte HTML y el log de la terminal)
       - name: Subir Artefactos
         uses: actions/upload-artifact@v4
         with:
@@ -121,4 +106,4 @@ jobs:
           path: |
             test_results.html
             test_output.txt
-          retention-days: 7 # Guarda los reportes por 7 días
+          retention-days: 7

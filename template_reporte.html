@@ -4,32 +4,70 @@
 <meta charset="UTF-8">
 <title>Resultados del Ejercicio OOP - Person</title>
 <style>
-body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center;}
-.container { background: white; padding: 30px; border-radius: 20px; max-width: 900px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.25);}
-.status-badge { padding: 10px 20px; border-radius: 50px; color: white; font-weight: bold; font-size: 1.2em; display: inline-block;}
-.success { background: #10b981; } .failed { background: #ef4444; }
-ul { padding-left: 20px; margin-top: 10px; } .pass { color: #10b981; font-weight: bold; } .fail { color: #ef4444; font-weight: bold; }
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 900px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.status-badge {
+    padding: 10px 20px;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+    display: inline-block;
+}
+.success { background: #10b981; }
+.failed { background: #ef4444; }
+
+ul { padding-left: 20px; margin-top: 10px; }
+.pass { color: #10b981; font-weight: bold; }
+.fail { color: #ef4444; font-weight: bold; }
+
 h2 { margin-top: 30px; }
 </style>
 </head>
 <body>
 <div class="container">
-<h1>🎓 Ejercicio OOP — Person</h1>
-<p>Resultados automáticos del test</p>
-<div class="status-badge $STATUS_CLASS">$STATUS_TEXT</div>
-<h2>👨‍💻 Información</h2>
-<p><b>Nombre:</b> $AUTHOR</p>
-<p><b>Email:</b> $EMAIL</p>
-<p><b>Fecha:</b> $TIMESTAMP</p>
-<p><b>Commit #:</b> $COMMIT_COUNT</p>
-<p><b>Mensaje:</b> "$COMMIT_MESSAGE"</p>
-<h2>📊 Resultados</h2>
-<p><b>Tests pasados:</b> $TESTS_PASSED / $TESTS_TOTAL</p>
-<p><b>Tests fallados:</b> $TESTS_FAILED</p>
-<h2>✅ Tests Pasados</h2>
-<ul>$PASSED_LIST</ul>
-<h2>❌ Tests Fallados</h2>
-<ul>$FAILED_LIST</ul>
+    <h1>🎓 Ejercicio OOP — Person</h1>
+    <p>Resultados automáticos del test</p>
+
+    <div class="status-badge $STATUS_CLASS">
+        $STATUS_TEXT
+    </div>
+
+    <h2>👨‍💻 Información</h2>
+    <p><b>Nombre:</b> $AUTHOR</p>
+    <p><b>Email:</b> $EMAIL</p>
+    <p><b>Fecha:</b> $TIMESTAMP</p>
+    <p><b>Commit #:</b> $COMMIT_COUNT</p>
+    <p><b>Mensaje:</b> "$COMMIT_MESSAGE"</p>
+
+    <h2>📊 Resultados</h2>
+    <p><b>Tests pasados:</b> $TESTS_PASSED / $TESTS_TOTAL</p>
+    <p><b>Tests fallados:</b> $TESTS_FAILED</p>
+
+    <h2>✅ Tests Pasados</h2>
+    <ul>
+        $PASSED_LIST
+    </ul>
+
+    <h2>❌ Tests Fallados</h2>
+    <ul>
+        $FAILED_LIST
+    </ul>
 </div>
 </body>
 </html>

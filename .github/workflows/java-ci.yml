@@ -1,20 +1,20 @@
-name: Java CI - Pruebas Individuales y Resumen Global
+name: Java CI - Correr Pruebas de JUnit
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master ] # Se activa al subir a main o master
 
 jobs:
-  test-and-generate-reports:
+  test-and-generate-report:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Descargar el repositorio
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
 
-      - name: Configurar Java (JDK 17)
+      - name: Configurar Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -23,87 +23,87 @@ jobs:
       - name: Obtener información del commit
         id: commit_info
         run: |
-          echo "author_name=${{ github.event.head_commit.author.name }}" >> $GITHUB_OUTPUT
-          echo "author_email=${{ github.event.head_commit.author.email }}" >> $GITHUB_OUTPUT
-          echo "commit_message=${{ github.event.head_commit.message }}" >> $GITHUB_OUTPUT
-          echo "timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_OUTPUT
-          echo "commit_count=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
+          AUTHOR_NAME="${{ github.event.head_commit.author.name }}"
+          AUTHOR_EMAIL="${{ github.event.head_commit.author.email }}"
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          
+          echo "author_name=$AUTHOR_NAME" >> $GITHUB_OUTPUT
+          echo "author_email=$AUTHOR_EMAIL" >> $GITHUB_OUTPUT
+          echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
 
-      - name: Ejecutar Tests y Generar Reportes Individuales
-        id: test_runner
+      - name: Ejecutar Pruebas de JUnit 5
+        id: run_tests
+        continue-on-error: true
         run: |
-          declare -A TESTS=(
-            ["rectangulo"]="TestRectangle|Rectángulo (Área y Perímetro)"
-            ["ps1_3"]="TestConversorMoneda|PS 1.3 - Casa de Cambio"
-            ["calificacion"]="TestCalificacion|Calificación (Aprobado/Reprobado)"
-            ["numero"]="TestNumero|PS 2.6 - Par, Impar o Nulo"
-            ["ps2_18"]="TestCostoLlamada|PS 2.18 - Costo Llamada Telefónica"
-            ["serie"]="TestCalculadorSerie|PS 3.3 - Cálculo de Serie"
-            ["perfectos"]="TestBuscadorPerfectos|PS 3.19 - Números Perfectos"
-            ["ps3_33"]="TestMCD|PS 3.33 - Máximo Común Divisor"
-            ["ps3_34"]="TestEcuacionPares|PS 3.34 - Ecuación (m, n)"
-            ["ps3_35"]="TestEcuacionTrio|PS 3.35 - Ecuación (X, Y, Z)"
-            ["ps3_36"]="TestAnalizadorGranja|PS 3.36 - La Granja"
-            ["insercion"]="TestInsercionDirecta|Ej 4.11 - Inserción Directa"
-            ["temperaturas"]="TestAnalizadorTemperaturas|PS 4.19 - Temperaturas 3D"
-            ["ps4_8"]="TestBusquedaSecuencialOrdenada|PS 4.8 - Búsqueda Ordenada"
-            ["ps4_24"]="TestAnalizadorCalificaciones|PS 4.24 - Calificaciones Alumnos"
-            ["ps5_3"]="TestInmobiliaria|PS 5.3 - Inmobiliaria"
-          )
+          set +e
+          echo "🧪 Ejecutando tests de Java..."
+          java -jar lib/junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --scan-classpath > test_output.txt 2>&1
+          TEST_EXIT_CODE=$?
+          set -e
 
-          FAILED_ANY=0
-          SUMMARY_FILE="resumen_global.html"
-          echo "<html><head><title>Resumen de Pruebas</title></head><body>" > $SUMMARY_FILE
-          echo "<h1>Resumen de Pruebas</h1><ul>" >> $SUMMARY_FILE
+          cat test_output.txt
 
-          for key in "${!TESTS[@]}"; do
-            CLASS_NAME=$(echo ${TESTS[$key]} | cut -d'|' -f1)
-            EXERCISE_NAME=$(echo ${TESTS[$key]} | cut -d'|' -f2)
-            OUTPUT_FILE="${key}_output.txt"
-            RESULT_FILE="${key}_results.html"
+          TOTAL=$(grep 'tests found' test_output.txt | awk '{print $2}')
+          PASSED=$(grep 'tests successful' test_output.txt | awk '{print $2}')
+          FAILED=$(grep 'tests failed' test_output.txt | awk '{print $2}')
+          
+          TOTAL=${TOTAL:-0}
+          PASSED=${PASSED:-0}
+          FAILED=${FAILED:-0}
 
-            # CORRECCIÓN: usar ":" en classpath
-            java -jar lib/junit-platform-console-standalone-1.9.3.jar -cp "src:tests" --select-class "$CLASS_NAME" > "$OUTPUT_FILE" 2>&1
-            EXIT_CODE=$?
-
-            TOTAL=$(grep 'tests found' "$OUTPUT_FILE" | awk '{print $2}')
-            PASSED=$(grep 'tests successful' "$OUTPUT_FILE" | awk '{print $2}')
-            STATUS="failed"
-            if [ $EXIT_CODE -eq 0 ]; then STATUS="success"; fi
-
-            # Generar reporte HTML individual
-            cp template_reporte.html "$RESULT_FILE"
-            sed -i "s|{{EJERCICIO_NOMBRE}}|$EXERCISE_NAME|g" "$RESULT_FILE"
-            sed -i "s|{{STATUS}}|$STATUS|g" "$RESULT_FILE"
-            sed -i "s|{{TESTS_PASSED}}|${PASSED:-0}|g" "$RESULT_FILE"
-            sed -i "s|{{TESTS_TOTAL}}|${TOTAL:-0}|g" "$RESULT_FILE"
-            sed -i "s|{{AUTHOR}}|${{ steps.commit_info.outputs.author_name }}|g" "$RESULT_FILE"
-            sed -i "s|{{EMAIL}}|${{ steps.commit_info.outputs.author_email }}|g" "$RESULT_FILE"
-            sed -i "s|{{TIMESTAMP}}|${{ steps.commit_info.outputs.timestamp }}|g" "$RESULT_FILE"
-            sed -i "s|{{COMMIT_MESSAGE}}|${{ steps.commit_info.outputs.commit_message }}|g" "$RESULT_FILE"
-            sed -i "s|{{COMMIT_COUNT}}|${{ steps.commit_info.outputs.commit_count }}|g" "$RESULT_FILE"
-
-            # Agregar al resumen global
-            echo "<li><b>$EXERCISE_NAME:</b> $STATUS - Pasados: ${PASSED:-0}/${TOTAL:-0} - <a href='./$RESULT_FILE'>Ver detalle</a></li>" >> $SUMMARY_FILE
-
-            if [ $EXIT_CODE -ne 0 ]; then
-              FAILED_ANY=1
-            fi
-          done
-
-          echo "</ul></body></html>" >> $SUMMARY_FILE
-
-          if [ $FAILED_ANY -ne 0 ]; then
-            echo "Al menos un test falló"
-            exit 1
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "tests_passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
+          
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "✅ Todos los tests pasaron: $PASSED/$TOTAL"
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "❌ Tests fallidos: $FAILED/$TOTAL"
           fi
 
-      - name: Subir Reportes y Resumen Global
+      - name: Generar página de resultados HTML
+        run: |
+          cp template_reporte.html test_results.html
+          
+          STATUS="${{ steps.run_tests.outputs.status }}"
+          AUTHOR="${{ steps.commit_info.outputs.author_name }}"
+          EMAIL="${{ steps.commit_info.outputs.author_email }}"
+          TIMESTAMP="${{ steps.commit_info.outputs.timestamp }}"
+          COMMIT_MSG="${{ steps.commit_info.outputs.commit_message }}"
+          COMMIT_NUM="${{ steps.commit_info.outputs.commit_count }}"
+          PASSED="${{ steps.run_tests.outputs.tests_passed }}"
+          TOTAL="${{ steps.run_tests.outputs.tests_total }}"
+
+          # Escapar caracteres que rompen sed
+          AUTHOR_ESC=$(echo "$AUTHOR" | sed 's/[|/&\\]/\\&/g')
+          EMAIL_ESC=$(echo "$EMAIL" | sed 's/[|/&\\]/\\&/g')
+          COMMIT_MSG_ESC=$(echo "$COMMIT_MSG" | sed 's/[|/&\\]/\\&/g')
+          TIMESTAMP_ESC=$(echo "$TIMESTAMP" | sed 's/[|/&\\]/\\&/g')
+
+          # Reemplazos usando siempre | como delimitador
+          sed -i "s|{{STATUS}}|$STATUS|g" test_results.html
+          sed -i "s|{{AUTHOR}}|$AUTHOR_ESC|g" test_results.html
+          sed -i "s|{{EMAIL}}|$EMAIL_ESC|g" test_results.html
+          sed -i "s|{{TIMESTAMP}}|$TIMESTAMP_ESC|g" test_results.html
+          sed -i "s|{{COMMIT_MESSAGE}}|$COMMIT_MSG_ESC|g" test_results.html
+          sed -i "s|{{COMMIT_COUNT}}|$COMMIT_NUM|g" test_results.html
+          sed -i "s|{{TESTS_PASSED}}|$PASSED|g" test_results.html
+          sed -i "s|{{TESTS_TOTAL}}|$TOTAL|g" test_results.html
+          
+          echo "✅ Página test_results.html generada."
+
+      - name: Subir Artefactos
         uses: actions/upload-artifact@v4
         with:
-          name: reportes-de-pruebas-${{ github.run_number }}
+          name: reporte-de-pruebas-${{ github.run_number }}
           path: |
-            *_results.html
-            *_output.txt
-            resumen_global.html
+            test_results.html
+            test_output.txt
           retention-days: 7

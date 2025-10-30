@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PS 3.19 - Números Perfectos</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
+        header h1 { margin: 0; }
+        main { padding: 30px; }
+        h2 { border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px; color: #333; }
+        .card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+        .card p, .card li { color: #444; line-height: 1.6; }
+        .card ul { padding-left: 20px; }
+        code { background: #eee; padding: 2px 5px; border-radius: 4px; font-family: 'Courier New', monospace; }
+        .diagram-container { background: #f9f9f9; border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; }
+        .diagram-container img { max-width: 100%; height: auto; }
+        .placeholder { color: #888; font-style: italic; }
+        .btn-probar { background-color: #10b981; color: white !important; border: none; padding: 12px 25px; font-size: 1em; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; text-decoration: none; display: inline-block; }
+        .btn-probar:hover { background-color: #059669; }
+        .back-link { display: inline-block; margin-top: 20px; color: #667eea; text-decoration: none; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PS 3.19 - Números Perfectos</h1>
+            <p>Encuentra números perfectos menores o iguales que N.</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>📝 Descripción del Problema</h2>
+                <p>
+                    Un número es perfecto si "la suma de sus divisores excepto el mismo es igual al propio número". Haga un diagrama de flujo para calcular e imprimir los números perfectos menores o iguales que N.
+                </p>
+                <p><strong>Dato:</strong> <code>N</code> (variable de tipo entero).</p>
+            </div>
+
+            <div class="card">
+                <h2>💡 Pistas y Fórmulas Clave</h2>
+                <ul>
+                    <li>La clase principal debe llamarse <code>BuscadorPerfectos.java</code>.</li>
+                    <li>Este problema requiere **bucles anidados**.</li>
+                    <li>El <strong>bucle exterior</strong> (<code>for i...</code>) itera desde 1 hasta N, probando cada número <code>i</code>.</li>
+                    <li>El <strong>bucle interior</strong> (<code>for j...</code>) itera desde 1 hasta <code>i-1</code>, buscando los divisores de <code>i</code>.</li>
+                    <li>La condición de divisor es: <code>if (i % j == 0)</code>.</li>
+                    <li>Necesitarás un acumulador <code>sumaDivisores</code> que se reinicia a 0 por cada número <code>i</code>.</li>
+                    <li>Después del bucle interior, compara: <code>if (sumaDivisores == i)</code>.</li>
+                    <li>Para las pruebas, el método debe devolver una <code>List&lt;Integer&gt;</code> con los números encontrados.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>📊 Diagrama de Flujo</h2>
+                <div class="diagram-container">
+                    <img src="../diagramas/ps3_19.png" alt="Diagrama de flujo para PS 3.19" 
+                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>▶️ Prueba y Resultados</h2>
+                <p>
+                    Presiona el botón para ver el reporte de pruebas de este ejercicio,
+                    generado automáticamente por GitHub Actions.
+                </p>
+                <a href="../perfectos_results.html" class="btn-probar" target="_blank">
+                    Ver Reporte de Pruebas
+                </a>
+            </div>
+
+            <a href="../index.html" class="back-link">← Volver al Inicio</a>
+        </main>
+    </div>
+</body>
+</html>

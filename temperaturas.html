@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PS 4.19 - Temperaturas 3D</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
+        header h1 { margin: 0; }
+        main { padding: 30px; }
+        h2 { border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px; color: #333; }
+        .card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+        .card p, .card li { color: #444; line-height: 1.6; }
+        .card ul { padding-left: 20px; }
+        code { background: #eee; padding: 2px 5px; border-radius: 4px; font-family: 'Courier New', monospace; }
+        .diagram-container { background: #f9f9f9; border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; }
+        .diagram-container img { max-width: 100%; height: auto; }
+        .placeholder { color: #888; font-style: italic; }
+        .btn-probar { background-color: #10b981; color: white !important; border: none; padding: 12px 25px; font-size: 1em; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; text-decoration: none; display: inline-block; }
+        .btn-probar:hover { background-color: #059669; }
+        .back-link { display: inline-block; margin-top: 20px; color: #667eea; text-decoration: none; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PS 4.19 - Temperaturas 3D</h1>
+            <p>Analiza un arreglo tridimensional [Estado][Mes][Año] de temperaturas.</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>📝 Descripción del Problema</h2>
+                <p>
+                    En el arreglo tridimensional <code>TEMP[32][12][50]</code> se almacenan promedios de temperaturas de los 32 estados, 12 meses, durante 50 años (1950-1999).
+                </p>
+                <p><strong>Dato:</strong> <code>TEMP[1..32, 1..12, 1950..1999]</code>.</p>
+                <p>Se debe calcular:</p>
+                <ul>
+                    <li>a) Estado con mayor temperatura promedio en los últimos 10 años (1990-1999).</li>
+                    <li>b) Estado con menor promedio anual en el último año (1999).</li>
+                    <li>c) Mes con mayor temperatura en el estado 29, en 1953.</li>
+                    <li>d) Mes y estado con la menor temperatura en 1975.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>💡 Pistas y Fórmulas Clave</h2>
+                <ul>
+                    <li>La clase principal debe llamarse <code>AnalizadorTemperaturas.java</code>.</li>
+                    <li><strong>Manejo de Índices (Clave):</strong> Los arreglos en Java son 0-indexados.
+                        <ul>
+                            <li>Estado 1-32 = Índice <code>e</code> 0-31 (<code>e = estado - 1</code>)</li>
+                            <li>Mes 1-12 = Índice <code>m</code> 0-11 (<code>m = mes - 1</code>)</li>
+                            <li>Año 1950-1999 = Índice <code>a</code> 0-49 (<code>a = año - 1950</code>)</li>
+                        </ul>
+                    </li>
+                    <li>El constructor debe recibir el arreglo <code>double[][][] datos</code>.</li>
+                    <li>Crea un método para cada inciso (ej. <code>incisoA()</code>, <code>incisoB()</code>, etc.).</li>
+                    <li>Para (a) y (b), necesitarás bucles anidados para calcular promedios y compararlos.</li>
+                    <li>Para (d), puedes crear una clase auxiliar interna (<code>ResultadoMesEstado</code>) para devolver ambos valores.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>📊 Diagrama de Flujo (Inciso A)</h2>
+                <div class="diagram-container">
+                    <img src="../diagramas/ps4_19.png" alt="Diagrama de flujo para PS 4.19 - Inciso A" 
+                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>▶️ Prueba y Resultados</h2>
+                <p>
+                    Presiona el botón para ver el reporte de pruebas de este ejercicio,
+                    generado automáticamente por GitHub Actions.
+                </p>
+                <a href="../temperaturas_results.html" class="btn-probar" target="_blank">
+                    Ver Reporte de Pruebas
+                </a>
+            </div>
+
+            <a href="../index.html" class="back-link">← Volver al Inicio</a>
+        </main>
+    </div>
+</body>
+</html>

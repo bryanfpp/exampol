@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ej 4.11 - Inserción Directa</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
+        header h1 { margin: 0; }
+        main { padding: 30px; }
+        h2 { border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px; color: #333; }
+        .card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+        .card p, .card li { color: #444; line-height: 1.6; }
+        .card ul { padding-left: 20px; }
+        code { background: #eee; padding: 2px 5px; border-radius: 4px; font-family: 'Courier New', monospace; }
+        .diagram-container { background: #f9f9f9; border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; }
+        .diagram-container img { max-width: 100%; height: auto; }
+        .placeholder { color: #888; font-style: italic; }
+        .btn-probar { background-color: #10b981; color: white !important; border: none; padding: 12px 25px; font-size: 1em; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; text-decoration: none; display: inline-block; }
+        .btn-probar:hover { background-color: #059669; }
+        .back-link { display: inline-block; margin-top: 20px; color: #667eea; text-decoration: none; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Ej 4.11 - Inserción Directa</h1>
+            <p>Ordena un arreglo de enteros usando el método de Inserción Directa.</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>📝 Descripción del Problema</h2>
+                <p>
+                    Ordenar las claves de un arreglo (<code>UNI</code>) utilizando el método de inserción directa.
+                </p>
+                <p><strong>Dato:</strong> <code>UNI</code> (arreglo de enteros).</p>
+            </div>
+
+            <div class="card">
+                <h2>💡 Pistas y Fórmulas Clave</h2>
+                <ul>
+                    <li>La clase principal debe llamarse <code>InsercionDirecta.java</code>.</li>
+                    <li>El método <code>ordenar(int[] uni)</code> debe ser <code>void</code>, ya que modifica el arreglo original (ordena "in-place").</li>
+                    <li>El <strong>bucle exterior</strong> (<code>for i...</code>) empieza en 1 (<code>i = 1</code>), no en 0.</li>
+                    <li>Guarda el valor a insertar: <code>int auxiliar = uni[i];</code></li>
+                    <li>El <strong>bucle interior</strong> (<code>while j...</code>) se mueve "hacia atrás" (<code>j--</code>) para desplazar los elementos mayores que <code>auxiliar</code>.</li>
+                    <li>Condición del <code>while</code>: <code>while (j >= 0 && uni[j] > auxiliar)</code></li>
+                    <li>Desplazamiento: <code>uni[j + 1] = uni[j];</code></li>
+                    <li>Inserción final: <code>uni[j + 1] = auxiliar;</code></li>
+                    <li>Para las pruebas, usa <code>assertArrayEquals(esperado, uni);</code>.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>📊 Diagrama de Flujo</h2>
+                <div class="diagram-container">
+                    <img src="../diagramas/ej4_11.png" alt="Diagrama de flujo para Ej 4.11" 
+                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>▶️ Prueba y Resultados</h2>
+                <p>
+                    Presiona el botón para ver el reporte de pruebas de este ejercicio,
+                    generado automáticamente por GitHub Actions.
+                </p>
+                <a href="../insercion_results.html" class="btn-probar" target="_blank">
+                    Ver Reporte de Pruebas
+                </a>
+            </div>
+
+            <a href="../index.html" class="back-link">← Volver al Inicio</a>
+        </main>
+    </div>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Pruebas - Proyecto OOP</title>
+    <title>Reporte de Pruebas - Proyecto Java OOP</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; display:flex; justify-content:center; align-items:center; }
@@ -23,13 +23,14 @@
         .error-suggestions { list-style:none; padding-left:0; }
         .error-suggestions li { padding:8px 0; color:#7f1d1d; }
         .error-suggestions li:before { content:"💡 "; margin-right:8px; }
+        pre { background:#fef3f3; padding:10px; border-radius:5px; overflow:auto; white-space:pre-wrap; word-wrap:break-word; }
         footer { background:#f8fafc; padding:20px; text-align:center; color:#64748b; font-size:0.9em; margin-top:20px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>☕ Reporte de Pruebas (Java/Python)</h1>
+            <h1>☕ Reporte de Pruebas (Java)</h1>
             <div class="status-badge status-{{STATUS}}">{{STATUS}}</div>
         </div>
 
@@ -54,10 +55,10 @@
                 <ul class="error-suggestions">
                     <li>Revisa los archivos modificados en <code>src/</code></li>
                     <li>Asegúrate de que los nombres de clases y métodos coincidan</li>
-                    <li>Verifica que el método <code>__str__</code> esté correctamente implementado</li>
-                    <li>Usa <code>.title()</code> para capitalizar correctamente</li>
+                    <li>Verifica que los métodos tengan la firma correcta según JUnit</li>
+                    <li>Confirma que las anotaciones <code>@Test</code> estén presentes</li>
                 </ul>
-                <pre style="margin-top:15px; background:#fef3f3; padding:10px; border-radius:5px; overflow:auto;">{{TEST_LOG}}</pre>
+                <pre>{{TEST_LOG}}</pre>
             </div>
         </div>
 

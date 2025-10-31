@@ -65,35 +65,37 @@ jobs:
 
     - name: Rellenar HTML
       run: |
-        sed -i "s/{{AUTHOR}}/${{ steps.commit_info.outputs.author }}/g" index.html
-        sed -i "s/{{COMMIT_MESSAGE}}/${{ steps.commit_info.outputs.message }}/g" index.html
-        sed -i "s/{{COMMIT_COUNT}}/${{ steps.commit_info.outputs.count }}/g" index.html
-        sed -i "s/{{TIMESTAMP}}/${{ steps.commit_info.outputs.time }}/g" index.html
-        
-        sed -i "s/{{TESTS_PASSED}}/${{ steps.run_tests.outputs.tests_passed }}/g" index.html
-        sed -i "s/{{TESTS_FAILED}}/${{ steps.run_tests.outputs.tests_failed }}/g" index.html
-        sed -i "s/{{TESTS_TOTAL}}/${{ steps.run_tests.outputs.tests_total }}/g" index.html
-
+        # Reemplazar index.html
+        sed -i "s|{{AUTHOR}}|${{ steps.commit_info.outputs.author }}|g" index.html
+        sed -i "s|{{COMMIT_MESSAGE}}|${{ steps.commit_info.outputs.message }}|g" index.html
+        sed -i "s|{{COMMIT_COUNT}}|${{ steps.commit_info.outputs.count }}|g" index.html
+        sed -i "s|{{TIMESTAMP}}|${{ steps.commit_info.outputs.time }}|g" index.html
+        sed -i "s|{{TESTS_PASSED}}|${{ steps.run_tests.outputs.tests_passed }}|g" index.html
+        sed -i "s|{{TESTS_FAILED}}|${{ steps.run_tests.outputs.tests_failed }}|g" index.html
+        sed -i "s|{{TESTS_TOTAL}}|${{ steps.run_tests.outputs.tests_total }}|g" index.html
         STATUS="${{ steps.run_tests.outputs.status }}"
-        sed -i "s/{{STATUS}}/$STATUS/g" index.html
-        sed -i "s/{{STATUS_TEXT}}/$([ "$STATUS" = "success" ] && echo '✅ ÉXITO' || echo '❌ FALLÓ')/g" index.html
-        
+        sed -i "s|{{STATUS}}|$STATUS|g" index.html
+        sed -i "s|{{STATUS_TEXT}}|$([ "$STATUS" = "success" ] && echo '✅ TODOS LOS TESTS PASARON' || echo '❌ HAY TESTS FALLIDOS')|g" index.html
         PASSED_HTML=$(echo "${{ steps.run_tests.outputs.passed_list }}" | sed 's/.*/<li class=\"pass\">&<\/li>/')
         FAILED_HTML=$(echo "${{ steps.run_tests.outputs.failed_list }}" | sed 's/.*/<li class=\"fail\">&<\/li>/')
-
         sed -i "s|{{PASSED_LIST}}|$PASSED_HTML|" index.html
         sed -i "s|{{FAILED_LIST}}|$FAILED_HTML|" index.html
 
-    - name: Preparar archivos para Pages
-      run: |
-        mkdir -p public
-        cp index.html public/
-        cp template_reporte.html public/
+        # Reemplazar template_reporte.html
+        sed -i "s|{{AUTHOR}}|${{ steps.commit_info.outputs.author }}|g" template_reporte.html
+        sed -i "s|{{COMMIT_MESSAGE}}|${{ steps.commit_info.outputs.message }}|g" template_reporte.html
+        sed -i "s|{{COMMIT_COUNT}}|${{ steps.commit_info.outputs.count }}|g" template_reporte.html
+        sed -i "s|{{TIMESTAMP}}|${{ steps.commit_info.outputs.time }}|g" template_reporte.html
+        sed -i "s|{{TESTS_PASSED}}|${{ steps.run_tests.outputs.tests_passed }}|g" template_reporte.html
+        sed -i "s|{{TESTS_FAILED}}|${{ steps.run_tests.outputs.tests_failed }}|g" template_reporte.html
+        sed -i "s|{{TESTS_TOTAL}}|${{ steps.run_tests.outputs.tests_total }}|g" template_reporte.html
+        sed -i "s|{{STATUS}}|$STATUS|g" template_reporte.html
+        sed -i "s|{{STATUS_TEXT}}|$([ "$STATUS" = "success" ] && echo '✅ TODOS LOS TESTS PASARON' || echo '❌ HAY TESTS FALLIDOS')|g" template_reporte.html
 
     - name: Subir archivos para Pages
       uses: actions/upload-pages-artifact@v3
       with:
-        path: public
+        path: .  # Publica index.html + template_reporte.html
 
   deploy:
     needs: tests

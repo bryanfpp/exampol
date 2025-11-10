@@ -23,18 +23,29 @@ fi
 SUMMARY_FILE="reports/test_summary.html"
 echo "" > "$SUMMARY_FILE"
 
-# Ejecutar todos los tests y generar XML
-java -jar lib/junit-platform-console-standalone-1.9.3.jar \
-    --class-path "bin:testbin" \
-    --scan-class-path \
-    --reports-dir reports/junit \
-    2>&1 | tee reports/test_output.txt
+# Ejecutar cada test de la carpeta tests individualmente
+for TESTFILE in $(find tests -name "*.java"); do
+    # Obtener nombre de clase con paquete
+    CLASS_NAME=$(echo "$TESTFILE" | sed 's|^tests/||; s|/|.|g; s|\.java$||')
 
-# Parsear cada XML para generar resumen por clase
-for XMLFILE in reports/junit/*.xml; do
-    CLASS_NAME=$(basename "$XMLFILE" .xml)
-    
-    # Extraer totales y fallidos del XML
+    echo "▶️ Ejecutando $CLASS_NAME ..."
+
+    # Ejecutar test con XML por clase
+    java -jar lib/junit-platform-console-standalone-1.9.3.jar \
+        --class-path "bin:testbin" \
+        --select-class "$CLASS_NAME" \
+        --reports-dir "reports/junit" \
+        --details=none \
+        2>&1 | tee reports/test_output.txt
+
+    # Extraer XML generado
+    XMLFILE=$(ls reports/junit/*"$CLASS_NAME"*.xml 2>/dev/null | head -1)
+
+    if [ ! -f "$XMLFILE" ]; then
+        echo "❌ $CLASS_NAME (0/0)<br>" >> "$SUMMARY_FILE"
+        continue
+    fi
+
     TOTAL=$(grep -oP 'tests="\K\d+' "$XMLFILE" | head -1)
     FAILED=$(grep -oP 'failures="\K\d+' "$XMLFILE" | head -1)
     PASSED=$((TOTAL - FAILED))
@@ -45,7 +56,6 @@ for XMLFILE in reports/junit/*.xml; do
         STATUS_EMOJI="❌"
     fi
 
-    # Escribir línea en test_summary.html
     echo "${STATUS_EMOJI} ${CLASS_NAME} (${PASSED}/${TOTAL})<br>" >> "$SUMMARY_FILE"
 done
 

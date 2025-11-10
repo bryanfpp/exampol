@@ -80,41 +80,28 @@ jobs:
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
 
+          # LIMPIAR CARACTERES ESPECIALES
+          cat test_output.txt | sed 's/├─/ /g; s/│/ /g; s/└─/ /g' > test_clean.txt
+
+          # GENERAR RESUMEN DE CLASES
           SUMMARY=$(awk '
-          # Detecta clase de test: línea con ├─ y un nombre de clase
-          /^[[:space:]]*│[[:space:]]*├─ [A-Za-z0-9_]+$/ {
-              gsub(/^[[:space:]]*│[[:space:]]*├─ /, "", $0);
-              current_class=$0
-              passed=0
-              total=0
-              next
-          }
-
-          # Detecta tests dentro de la clase: línea con ├─ y paréntesis
-          /^[[:space:]]*│[[:space:]]*│[[:space:]]*├─ [A-Za-z0-9_]+\(\)/ {
-              total++
-              if ($0 ~ /✔/) passed++
-          }
-
-          # Al encontrar otra clase o línea vacía, imprime la anterior
-          /^$/ {
+          /^[^ ]/ && /✔|✘/ { current_class=$1; passed=0; total=0; next }
+          /.*\(\)/ { total++; if ($0 ~ /✔/) passed++ }
+          /^$/ || (/^[^ ]/ && /✔|✘/) {
               if (current_class != "" && total>0) {
-                  status = (passed==total) ? "✅" : "❌"
+                  status=(passed==total)?"✅":"❌"
                   print status " " current_class " (" passed "/" total ")"
                   current_class=""
               }
           }
-
           END {
               if (current_class != "" && total>0) {
-                  status = (passed==total) ? "✅" : "❌"
+                  status=(passed==total)?"✅":"❌"
                   print status " " current_class " (" passed "/" total ")"
               }
           }
-          ' test_output.txt)
+          ' test_clean.txt)
 
-
-          # Exportar el resumen para HTML
           echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
 
           set -e

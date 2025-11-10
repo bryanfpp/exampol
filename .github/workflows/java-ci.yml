@@ -61,13 +61,14 @@ jobs:
 
           TEST_EXIT_CODE=$?
 
-          TOTAL=$(grep -oP "(?<=tests found: )\d+" test_output.txt | head -1)
-          PASSED=$(grep -oP "(?<=tests successful: )\d+" test_output.txt | head -1)
-          FAILED=$(grep -oP "(?<=tests failed: )\d+" test_output.txt | head -1)
+          TOTAL=$(grep -oP "\[\s*\K\d+(?=\s+tests found)" test_output.txt | head -1)
+          PASSED=$(grep -oP "\[\s*\K\d+(?=\s+tests successful)" test_output.txt | head -1)
+          FAILED=$(grep -oP "\[\s*\K\d+(?=\s+tests failed)" test_output.txt | head -1)
 
           TOTAL=${TOTAL:-0}
           PASSED=${PASSED:-0}
           FAILED=${FAILED:-0}
+
 
           echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
           echo "tests_passed=$PASSED" >> $GITHUB_OUTPUT

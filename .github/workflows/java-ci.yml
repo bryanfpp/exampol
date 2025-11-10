@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout código
         uses: actions/checkout@v4
 
@@ -35,17 +34,15 @@ jobs:
             echo "⚠️ No se encontraron tests"
           fi
 
-      - name: Ejecutar tests
+      - name: Ejecutar tests y generar salida
+        id: run_tests
         run: |
           java -jar lib/junit-platform-console-standalone-1.9.3.jar \
-          --class-path "bin:testbin" \
+          --class-path "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" \
           --scan-class-path > test_output.txt || true
 
       - name: Preparar reporte HTML
         run: |
-          echo "📄 Contenido ORIGINAL del template:"
-          cat template_reporte.html
-
           cp template_reporte.html index.html
 
           AUTHOR="$(git log -1 --pretty=format:'%an')"
@@ -53,20 +50,18 @@ jobs:
           DATE="$(git log -1 --pretty=format:'%ad')"
           MESSAGE="$(git log -1 --pretty=format:'%s')"
 
-          OUTPUT=$(sed ':a;N;$!ba;s/\n/<br>/g' test_output.txt)
+          sed -i "s/{{AUTHOR}}/$AUTHOR/" index.html
+          sed -i "s/{{EMAIL}}/$EMAIL/" index.html
+          sed -i "s/{{DATE}}/$DATE/" index.html
+          sed -i "s/{{MESSAGE}}/$MESSAGE/" index.html
 
-          # Reemplazos a prueba de Windows, BOM y caracteres ocultos
-          perl -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" index.html
-          perl -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" index.html
-          perl -pi -e "s/\{\{DATE\}\}/$DATE/g" index.html
-          perl -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" index.html
-          perl -pi -e "s/\{\{TEST_OUTPUT\}\}/$OUTPUT/g" index.html
+          OUTPUT=$(sed 's/"/\\"/g' test_output.txt | sed ':a;N;$!ba;s/\n/<br>/g')
+          sed -i "s|{{TEST_OUTPUT}}|$OUTPUT|" index.html
 
-          echo "✅ CONTENIDO FINAL index.html:"
-          cat index.html
-
-      - name: Subir artefacto
+      - name: Guardar artefactos
         uses: actions/upload-artifact@v4
         with:
-          name: reporte-final
-          path: index.html
+          name: test-report
+          path: |
+            index.html
+            test_output.txt

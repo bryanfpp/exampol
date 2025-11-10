@@ -137,9 +137,16 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
+          # Guardamos el contenido en un archivo temporal
           echo "$TEST_CLASS_SUMMARY" > test_class_summary_tmp.html
-          perl -CS -0777 -pe 's/\{\{TEST_CLASS_SUMMARY\}\}/do { local(@ARGV,$/) = @ARGV; open F, shift; join "", <F> }/e' test_class_summary_tmp.html reporte.html
-
+          # Reemplazo seguro de todo el contenido en reporte.html
+          perl -CS -0777 -pe '
+            local $/ = undef;
+            open my $fh, "<", "test_class_summary_tmp.html" or die $!;
+            my $summary = <$fh>;
+            close $fh;
+            s/\{\{TEST_CLASS_SUMMARY\}\}/$summary/g
+          ' reporte.html
 
 
 

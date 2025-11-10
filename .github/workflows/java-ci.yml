@@ -136,7 +136,7 @@ jobs:
 
           # Escapar caracteres para que no rompan perl
           SAFE_OUTPUT=$(printf "%s" "$OUTPUT" | sed 's/[&/]/\\&/g')
-
+          
           perl -CS -pi -e "s/\{\{STATUS\}\}/$STATUS/g" index.html
           perl -CS -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" index.html
           perl -CS -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" index.html
@@ -144,6 +144,8 @@ jobs:
           perl -CS -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" index.html
           perl -CS -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" index.html
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" index.html
+          FAILED=$((TOTAL - PASSED))
+          perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" index.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" index.html
 
 

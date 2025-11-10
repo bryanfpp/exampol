@@ -29,9 +29,12 @@
         <div class="header">
             <h1>☕ Reporte de Pruebas (Java/JUnit)</h1>
             <p>Resultados de la ejecución de todos los tests del proyecto</p>
-            <div class="status-badge status-{{STATUS}}">
-                {{STATUS}}
-            </div>
+            <div style="margin-top:15px; font-size:18px;">
+  <p><strong>Total de tests:</strong> {{TESTS_TOTAL}}</p>
+  <p><strong>Tests exitosos:</strong> ✅ {{TESTS_PASSED}}</p>
+  <p><strong>Tests fallidos:</strong> ❌ {{TESTS_FAILED}}</p>
+</div>
+
         </div>
         
         <div class="content">

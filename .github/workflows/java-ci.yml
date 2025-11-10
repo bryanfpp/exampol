@@ -1,4 +1,4 @@
-name: Java CI
+name: Java CI - JUnit
 
 on:
   push:
@@ -12,54 +12,50 @@ jobs:
 
     steps:
 
-    - name: Checkout del repositorio
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Configurar Java 21
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '21'
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
 
-    - name: Crear carpetas necesarias
-      run: |
-        mkdir -p bin
-        mkdir -p testbin
+      - name: Crear carpetas de compilación
+        run: |
+          mkdir -p bin
+          mkdir -p testbin
 
-    - name: Compilar código fuente
-      run: |
-        javac -d bin src/*.java
+      - name: Compilar código fuente (src/*.java)
+        run: javac -d bin src/*.java
 
-    - name: Compilar tests
-      run: |
-        javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:bin" -d testbin tests/*.java
+      - name: Compilar tests (tests/*.java)
+        run: javac -cp "bin:lib/junit-platform-console-standalone-1.9.3.jar" -d testbin tests/*.java
 
-    - name: Ejecutar tests y guardar salida
-      run: |
-        java -jar lib/junit-platform-console-standalone-1.9.3.jar \
-        -cp "bin:testbin" --scan-class-path > test_output.txt
+      - name: Ejecutar tests y guardar salida
+        run: |
+          java -jar lib/junit-platform-console-standalone-1.9.3.jar \
+          --class-path "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" \
+          --scan-class-path > test_output.txt || true
 
-    - name: Generar archivo HTML final
-      run: |
-        TEST_RESULT="PASSED"
-        NAME="Bryan fuentes Perez"
-        EMAIL="230110581@itsoeh.edu.mx"
-        MESSAGE="resuelto"
-        DATE="$(date)"
+      - name: Ver salida en consola
+        run: cat test_output.txt
 
-        cp template_reporte.html index.html
+      - name: Determinar estado de los tests
+        id: teststatus
+        run: |
+          if grep -q "FAILURE" test_output.txt; then
+            echo "status=failed" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
 
-        sed -i "s/{{STATUS}}/$TEST_RESULT/" index.html
-        sed -i "s/{{AUTHOR}}/$NAME/" index.html
-        sed -i "s/{{EMAIL}}/$EMAIL/" index.html
-        sed -i "s/{{MESSAGE}}/$MESSAGE/" index.html
-        sed -i "s/{{DATE}}/$DATE/" index.html
+      - name: Generar reporte HTML
+        run: |
+          cp template_reporte.html index.html
 
-        OUTPUT=$(sed 's/"/\\"/g' test_output.txt | sed ':a;N;$!ba;s/\n/<br>/g')
-        sed -i "s|{{TEST_OUTPUT}}|$OUTPUT|" index.html
-
-    - name: Subir artefacto HTML final
-      uses: actions/upload-artifact@v4
-      with:
-        name: reporte-tests
-        path: index.html
+          STATUS="${{ steps.teststatus.outputs.status }}"
+          AUTHOR="$(git log -1 --pretty=format:'%an')"
+          TIMESTAMP="$(git log -1 --pretty=format:'%ad')"
+          COMMIT_MESSAGE="$(git log -1 --pretty=format:'%s')"
+          COMMIT_COUNT=$(git rev_

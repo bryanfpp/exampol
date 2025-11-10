@@ -80,27 +80,15 @@ jobs:
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
 
+          # -----------------------------
           # LIMPIAR CARACTERES ESPECIALES
           cat test_output.txt | sed 's/├─/ /g; s/│/ /g; s/└─/ /g' > test_clean.txt
 
-          # GENERAR RESUMEN DE CLASES
-          SUMMARY=$(awk '
-          /^[^ ]/ && /✔|✘/ { current_class=$1; passed=0; total=0; next }
-          /.*\(\)/ { total++; if ($0 ~ /✔/) passed++ }
-          /^$/ || (/^[^ ]/ && /✔|✘/) {
-              if (current_class != "" && total>0) {
-                  status=(passed==total)?"✅":"❌"
-                  print status " " current_class " (" passed "/" total ")"
-                  current_class=""
-              }
-          }
-          END {
-              if (current_class != "" && total>0) {
-                  status=(passed==total)?"✅":"❌"
-                  print status " " current_class " (" passed "/" total ")"
-              }
-          }
-          ' test_clean.txt)
+          # -----------------------------
+          # IMPRIMIR EL CONTENIDO LIMPIO PARA DEPURAR
+          echo "=== CONTENIDO LIMPIO ==="
+          cat test_clean.txt
+          echo "========================"
 
           echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
 

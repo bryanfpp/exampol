@@ -80,26 +80,31 @@ jobs:
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
 
-          # Generar resumen vertical de clases
           SUMMARY=$(awk '
-          /^[[:space:]]*│[[:space:]]*├─ [A-Za-z0-9_]+ ✔|✘/ {
-              gsub(/^[[:space:]]*│[[:space:]]*├─ | ✔|✘/, "", $0);
+          # Detecta clase de test: línea con ├─ y un nombre de clase
+          /^[[:space:]]*│[[:space:]]*├─ [A-Za-z0-9_]+$/ {
+              gsub(/^[[:space:]]*│[[:space:]]*├─ /, "", $0);
               current_class=$0
               passed=0
               total=0
               next
           }
-          /^[[:space:]]*│[[:space:]]*│[[:space:]]*├─ [a-zA-Z0-9_]+\(\)/ {
+
+          # Detecta tests dentro de la clase: línea con ├─ y paréntesis
+          /^[[:space:]]*│[[:space:]]*│[[:space:]]*├─ [A-Za-z0-9_]+\(\)/ {
               total++
               if ($0 ~ /✔/) passed++
           }
-          /^[[:space:]]*│[[:space:]]*├─ [A-Za-z0-9_]+ ✔|✘|^$/ {
+
+          # Al encontrar otra clase o línea vacía, imprime la anterior
+          /^$/ {
               if (current_class != "" && total>0) {
                   status = (passed==total) ? "✅" : "❌"
                   print status " " current_class " (" passed "/" total ")"
                   current_class=""
               }
           }
+
           END {
               if (current_class != "" && total>0) {
                   status = (passed==total) ? "✅" : "❌"
@@ -107,6 +112,7 @@ jobs:
               }
           }
           ' test_output.txt)
+
 
           # Exportar el resumen para HTML
           echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT

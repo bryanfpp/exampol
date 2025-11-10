@@ -2,8 +2,8 @@ for TESTFILE in $(find tests -name "*.java"); do
     TESTNAME=$(basename "$TESTFILE" .java)
     echo "▶️ Ejecutando $TESTNAME ..."
 
-    OUTPUT=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" org.junit.platform.console.ConsoleLauncher \
-        -c "$TESTNAME" 2>&1 || true)
+    OUTPUT=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" org.junit.runner.JUnitCore "$TESTNAME" 2>&1 || true)
+
 
     # Extraer totales
     TOTAL_TESTS=$(echo "$OUTPUT" | grep -oP 'Tests found: \K\d+' | head -1)

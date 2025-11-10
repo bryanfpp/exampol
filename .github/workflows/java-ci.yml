@@ -122,7 +122,9 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -0777 -pe 's/\{\{TEST_CLASS_SUMMARY\}\}/do { local $/; open my $fh, "<", "reports/test_summary.html"; <$fh> }/ge' reporte.html
+          SUMMARY_FILE="reports/test_summary.html"
+          perl -CS -0777 -pe 's/\{\{TEST_CLASS_SUMMARY\}\}/do { local $/; open my $fh, "<", "'"$SUMMARY_FILE"'" ; <$fh> }/ge' reporte.html
+
 
 
 

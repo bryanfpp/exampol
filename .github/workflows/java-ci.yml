@@ -80,36 +80,31 @@ jobs:
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
 
-          set -e
-          # Genera resumen por clase (✅ o ❌) basado en tu salida de JUnit
           SUMMARY=$(awk '
-          # Detecta la línea de la clase: empieza con │  ├─ nombre_clase ✔ o ✘
-          /^│  ├─ [A-Za-z0-9_]+ ✔|✘$/ {
-              gsub(/^│  ├─ /, "", $0)
-              current_class=$0
-              passed=0
-              total=0
-              next
+          /├─ [A-Za-z0-9_]+ ✔|✘/ {
+              gsub(/├─ | ✔|✘/, "", $0);
+              current_class=$0; passed=0; total=0; next
           }
-
-          # Detecta cada test dentro de la clase: empieza con │  │  ├─ test() ✔ o ✘
-          /^│  │  ├─ .* ✔|✘/ {
+          /│  ├─ [a-zA-Z0-9_]+\(\) ✔|✘/ {
               total++
               if ($0 ~ /✔/) passed++
           }
-
-          # Cuando aparece la línea de cierre de clase o siguiente clase
-          /^│  ├─ [A-Za-z0-9_]+ ✔|✘$/ || /^├─/ || /^└─/ {
+          /└─/ {
               if (current_class != "") {
-                  status = (passed==total) ? "✅" : "❌"
-                  print status " " current_class " (" passed "/" total ")"
+                  status = (passed==total) ? "✅" : "❌";
+                  print status " " current_class " (" passed "/" total ")<br>";
                   current_class=""
               }
           }
           ' test_output.txt)
 
-          # Exportar variable para HTML
+          # Exportar variables para usar en el HTML
           echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
+          CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
+          SAFE_OUTPUT=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g' | sed 's/[&/]/\\&/g')
+          echo "test_output=$SAFE_OUTPUT" >> $GITHUB_OUTPUT
+
+          set -e
 
 
       - name: Generar reporte.html final
@@ -130,6 +125,7 @@ jobs:
           CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
           OUTPUT=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
           SAFE_OUTPUT=$(printf "%s" "$OUTPUT" | sed 's/[&/]/\\&/g')
+          TEST_CLASS_SUMMARY="${{ steps.run_tests.outputs.test_class_summary }}"
 
           perl -CS -pi -e "s/\{\{STATUS\}\}/$STATUS/g" reporte.html
           perl -CS -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" reporte.html

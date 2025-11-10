@@ -32,7 +32,6 @@ jobs:
             javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:bin" -d testbin tests/*.java
           else
             echo "⚠️ No hay archivos de test en tests/"
-          fi
 
       - name: Información del commit
         id: commit_info
@@ -84,33 +83,22 @@ jobs:
       - name: Generar SUMMARY
         id: test_summary
         run: |
-          # Leer la salida de tests
           RAW_OUTPUT=$(cat test_output.txt)
-
-          # Eliminar secuencias ANSI (colores, estilos, etc.)
           CLEAN_OUTPUT=$(echo "$RAW_OUTPUT" | sed 's/\x1B\[[0-9;]*[A-Za-z]//g')
-
-          # Eliminar caracteres no imprimibles excepto saltos de línea
           CLEAN_OUTPUT=$(echo "$CLEAN_OUTPUT" | tr -cd '\11\12\15\40-\176')
-
-          # Convertir saltos de línea a <br> para HTML
           SUMMARY_HTML=$(echo "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
 
-          # Guardar como variable de salida de GitHub Actions
-          echo "SUMMARY=$SUMMARY_HTML" >> $GITHUB_OUTPUT
+          # Exportamos con el nombre correcto
+          echo "TEST_CLASS_SUMMARY=$SUMMARY_HTML" >> $GITHUB_OUTPUT
 
-          # Mostrar en logs para verificación
           echo "=== SUMMARY ==="
           echo "$SUMMARY_HTML"
           echo "=========================="
 
-
       - name: Generar reporte.html final
         env:
-          TEST_CLASS_SUMMARY: ${{ steps.test_summary.outputs.SUMMARY }}
+          TEST_CLASS_SUMMARY: ${{ steps.test_summary.outputs.TEST_CLASS_SUMMARY }}
         run: |
-        
-          # YA NO tocamos index.html, solo generamos reporte.html
           cp template_reporte.html reporte.html
 
           STATUS="${{ steps.run_tests.outputs.status }}"
@@ -137,10 +125,7 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$SUMMARY/g" reporte.html
-
-
-
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$TEST_CLASS_SUMMARY/g" reporte.html
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
@@ -148,7 +133,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: exampol
-          directory: ./   # Esto asegura que se publique index.html + reporte.html
+          directory: ./  
 
       - name: Subir reporte de error (si falló)
         if: steps.run_tests.outputs.status == 'failed'

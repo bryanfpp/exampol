@@ -80,15 +80,11 @@ jobs:
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
 
-          # Limpiar caracteres especiales de caja
-          cat test_output.txt | sed 's/├─/ /g; s/│/ /g; s/└─/ /g' > test_clean.txt
-
-          # Mostrar el contenido limpio
-          echo "=== CONTENIDO LIMPIO ==="
-          cat test_clean.txt
-          echo "========================"
-
-          echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
+          # ---- Capturar toda la salida de los tests como TEST_CLASS_SUMMARY ----
+          TEST_CLASS_SUMMARY=$(cat -v test_output.txt)
+          echo "test_class_summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$TEST_CLASS_SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
           set -e
 
@@ -103,6 +99,7 @@ jobs:
           EMAIL="${{ steps.commit_info.outputs.author_email }}"
           DATE="${{ steps.commit_info.outputs.timestamp }}"
           MESSAGE="${{ steps.commit_info.outputs.commit_message }}"
+          COMMIT="${{ steps.commit_info.outputs.commit_count }}"
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
           FAILED=$((TOTAL - PASSED))
@@ -116,11 +113,13 @@ jobs:
           perl -CS -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" reporte.html
           perl -CS -pi -e "s/\{\{DATE\}\}/$DATE/g" reporte.html
           perl -CS -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" reporte.html
+          perl -CS -pi -e "s/\{\{COMMIT\}\}/$COMMIT/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$SUMMARY/g" index.html
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/\${{ steps.run_tests.outputs.test_class_summary }}/g" index.html
+
 
 
       - name: Deploy to Cloudflare Pages

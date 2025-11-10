@@ -1,94 +1,65 @@
-name: Java CI Cloudflare
+name: Java CI
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  build-test-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 1. Obtener repo
-        uses: actions/checkout@v3
 
-      - name: 2. Obtener metadata del commit
-        id: commit_data
-        run: |
-          echo "USER_NAME=$(git log -1 --pretty=format:'%an')" >> $GITHUB_OUTPUT
-          echo "EMAIL=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_OUTPUT
-          echo "MESSAGE=$(git log -1 --pretty=format:'%s')" >> $GITHUB_OUTPUT
-          echo "DATE=$(git log -1 --pretty=format:'%ad')" >> $GITHUB_OUTPUT
-          echo "ISCORRECT=true" >> $GITHUB_OUTPUT      
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
 
-      - name: 3. Instalar Java 21
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+    - name: Configurar Java 21
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '21'
 
-      - name: 4. Crear carpetas necesarias
-        run: |
-          mkdir -p bin
+    - name: Crear carpetas necesarias
+      run: |
+        mkdir -p bin
+        mkdir -p testbin
 
-      - name: 5. Compilar código Java
-        run: |
-          echo "Compilando archivos en src/"
-          javac -d bin src/*.java
+    - name: Compilar código fuente
+      run: |
+        javac -d bin src/*.java
 
-      - name: 6. Ejecutar tests con JUnit Console Launcher
-        continue-on-error: true
-        id: junit_run
-        run: |
-          echo "Ejecutando tests..."
-          java -jar lib/junit-platform-console-standalone-1.9.3.jar -cp "bin" --scan-class-path > test_output.txt 2>&1
-          
-          # Guardar salida para reporte
-          echo "=== RESULTADO DEL TEST ==="
-          cat test_output.txt
+    - name: Compilar tests
+      run: |
+        javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:bin" -d testbin tests/*.java
 
-      - name: 7. Evaluar resultados de los tests
-        id: test_eval
-        run: |
-          if grep -q "FAILURE" test_output.txt || grep -q "FAILED" test_output.txt; then
-            echo "TEST_RESULT=FAILED" >> $GITHUB_OUTPUT
-          else
-            echo "TEST_RESULT=PASSED" >> $GITHUB_OUTPUT
-          fi
+    - name: Ejecutar tests y guardar salida
+      run: |
+        java -jar lib/junit-platform-console-standalone-1.9.3.jar \
+        -cp "bin:testbin" --scan-class-path > test_output.txt
 
-      - name: 8. Preparar reporte HTML
-        run: |
-          TEST_RESULT="${{ steps.test_eval.outputs.TEST_RESULT }}"
-          NAME="${{ steps.commit_data.outputs.USER_NAME }}"
-          EMAIL="${{ steps.commit_data.outputs.EMAIL }}"
-          MESSAGE="${{ steps.commit_data.outputs.MESSAGE }}"
-          DATE="${{ steps.commit_data.outputs.DATE }}"
+    - name: Generar archivo HTML final
+      run: |
+        TEST_RESULT="PASSED"
+        NAME="Bryan fuentes Perez"
+        EMAIL="230110581@itsoeh.edu.mx"
+        MESSAGE="resuelto"
+        DATE="$(date)"
 
-          cp templante_reporte.html index.html
+        cp template_reporte.html index.html
 
-          sed -i "s/{{STATUS}}/$TEST_RESULT/" index.html
-          sed -i "s/{{AUTHOR}}/$NAME/" index.html
-          sed -i "s/{{EMAIL}}/$EMAIL/" index.html
-          sed -i "s/{{MESSAGE}}/$MESSAGE/" index.html
-          sed -i "s/{{DATE}}/$DATE/" index.html
+        sed -i "s/{{STATUS}}/$TEST_RESULT/" index.html
+        sed -i "s/{{AUTHOR}}/$NAME/" index.html
+        sed -i "s/{{EMAIL}}/$EMAIL/" index.html
+        sed -i "s/{{MESSAGE}}/$MESSAGE/" index.html
+        sed -i "s/{{DATE}}/$DATE/" index.html
 
-          # Insertar salida de tests en la sección {{TEST_OUTPUT}}
-          OUTPUT=$(sed 's/"/\\"/g' test_output.txt | sed ':a;N;$!ba;s/\n/<br>/g')
-          sed -i "s|{{TEST_OUTPUT}}|$OUTPUT|" index.html
+        OUTPUT=$(sed 's/"/\\"/g' test_output.txt | sed ':a;N;$!ba;s/\n/<br>/g')
+        sed -i "s|{{TEST_OUTPUT}}|$OUTPUT|" index.html
 
-      - name: 9. Generar artefactos si fallan
-        if: steps.test_eval.outputs.TEST_RESULT == 'FAILED'
-        uses: actions/upload-artifact@v4
-        with:
-          name: test_output
-          path: test_output.txt
-
-      - name: 10. Deploy a Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: "java-tutor"
-          directory: "./"
+    - name: Subir artefacto a GitHub
+      uses: actions/upload-artifact@v3
+      with:
+        name: reporte-tests
+        path: index.html

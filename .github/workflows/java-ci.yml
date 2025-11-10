@@ -80,12 +80,6 @@ jobs:
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
 
-          # Asegúrate de que test_output.txt existe
-          if [ ! -f test_output.txt ]; then
-            echo "❌ test_output.txt no existe. Asegúrate de ejecutar los tests primero."
-            exit 1
-          fi
-
           # Limpiar caracteres especiales de caja
           cat test_output.txt | sed 's/├─/ /g; s/│/ /g; s/└─/ /g' > test_clean.txt
 

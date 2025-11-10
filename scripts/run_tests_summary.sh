@@ -5,12 +5,12 @@ echo "🧪 Ejecutando tests y generando summary..."
 # Crear carpetas si no existen
 mkdir -p bin testbin reports
 
-# Compilar src/*.java incluyendo subcarpetas
+# Compilar src/*.java
 echo "Compilando src/*.java..."
 find src -name "*.java" > sources.txt
 javac -d bin @sources.txt
 
-# Compilar tests/*.java incluyendo subcarpetas
+# Compilar tests/*.java
 echo "Compilando tests/*.java..."
 if ls tests/*.java >/dev/null 2>&1; then
     find tests -name "*.java" > test_sources.txt
@@ -23,37 +23,35 @@ fi
 SUMMARY_FILE="reports/test_summary.html"
 echo "" > "$SUMMARY_FILE"
 
-# Ejecutar cada test de la carpeta tests
-for TESTFILE in $(find tests -name "*.java"); do
-    # Convertir ruta a nombre de clase completo (con paquete si existe)
-    TESTNAME=$(echo "$TESTFILE" | sed 's|^tests/||; s|/|.|g; s|\.java$||')
+# Ejecutar todos los tests usando scan-class-path
+OUTPUT=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" \
+    org.junit.platform.console.ConsoleLauncher \
+    --class-path "testbin" \
+    --scan-class-path \
+    --details=summary \
+    2>&1 || true)
 
-    echo "▶️ Ejecutando $TESTNAME ..."
+# Extraer resultados por clase
+# Cada línea de salida de summary de JUnit 5 tiene formato:
+# TestConversorMoneda ✔
+# TestEcuacionTrio ✘
+echo "$OUTPUT" | grep -E '^[^ ]+ [✔✘]' | while read -r line; do
+    CLASS_NAME=$(echo "$line" | awk '{print $1}')
+    STATUS=$(echo "$line" | awk '{print $2}')
 
-    # Ejecutar test con JUnit 5 ConsoleLauncher
-    OUTPUT=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" \
-        org.junit.platform.console.ConsoleLauncher \
-        --class-path "bin:testbin" \
-        --scan-class-path \
-        --include-classname ".*$TESTNAME" 2>&1 || true)
+    # Contar tests totales, fallidos y pasados
+    CLASS_OUTPUT=$(echo "$OUTPUT" | awk "/$CLASS_NAME/,/^$/")
+    TOTAL=$(echo "$CLASS_OUTPUT" | grep -c '()')
+    FAILED=$(echo "$CLASS_OUTPUT" | grep -c '✘')
+    PASSED=$((TOTAL - FAILED))
 
-    # Extraer totales de la salida
-    TOTAL_TESTS=$(echo "$OUTPUT" | grep -oP 'Tests found: \K\d+' | head -1)
-    PASSED_TESTS=$(echo "$OUTPUT" | grep -oP 'Tests succeeded: \K\d+' | head -1)
-    FAILED_TESTS=$(echo "$OUTPUT" | grep -oP 'Tests failed: \K\d+' | head -1)
-
-    TOTAL_TESTS=${TOTAL_TESTS:-0}
-    PASSED_TESTS=${PASSED_TESTS:-0}
-    FAILED_TESTS=${FAILED_TESTS:-0}
-
-    if [ "$FAILED_TESTS" -eq 0 ]; then
+    if [ "$STATUS" = "✔" ]; then
         STATUS_EMOJI="✅"
     else
         STATUS_EMOJI="❌"
     fi
 
-    # Escribir línea en test_summary.html
-    echo "${STATUS_EMOJI} ${TESTNAME} (${PASSED_TESTS}/${TOTAL_TESTS})<br>" >> "$SUMMARY_FILE"
+    echo "${STATUS_EMOJI} ${CLASS_NAME} (${PASSED}/${TOTAL})<br>" >> "$SUMMARY_FILE"
 done
 
 echo "✅ test_summary.html generado en $SUMMARY_FILE"

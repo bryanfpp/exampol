@@ -44,8 +44,8 @@ for TESTFILE in $(find tests -name "*.java"); do
         --details=none \
         2>&1 | tee reports/test_output.txt
 
-    # Buscar XML generado para esta clase
-    XMLFILE=$(ls reports/junit/*"$CLASS_SIMPLE"*.xml 2>/dev/null | head -1)
+    # Buscar XML correctamente
+    XMLFILE=$(ls reports/junit/TEST-"$CLASS_SIMPLE".xml 2>/dev/null | head -1)
 
     if [ ! -f "$XMLFILE" ]; then
         echo "❌ $CLASS_SIMPLE (0/0)<br>" >> "$SUMMARY_FILE"
@@ -55,6 +55,8 @@ for TESTFILE in $(find tests -name "*.java"); do
     # Extraer totales y fallidos
     TOTAL=$(grep -oP 'tests="\K\d+' "$XMLFILE" | head -1)
     FAILED=$(grep -oP 'failures="\K\d+' "$XMLFILE" | head -1)
+    TOTAL=${TOTAL:-0}
+    FAILED=${FAILED:-0}
     PASSED=$((TOTAL - FAILED))
 
     if [ "$FAILED" -eq 0 ]; then

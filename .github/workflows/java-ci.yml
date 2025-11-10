@@ -128,7 +128,11 @@ jobs:
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
 
-          OUTPUT=$(sed ':a;N;$!ba;s/\n/<br>/g' test_output.txt)
+          # Quitar códigos de color ANSI del log
+          CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
+
+          # Cambiar saltos de línea por <br>
+          OUTPUT=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
 
           perl -pi -e "s/\{\{STATUS\}\}/$STATUS/g" index.html
           perl -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" index.html
@@ -138,6 +142,7 @@ jobs:
           perl -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" index.html
           perl -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" index.html
           perl -pi -e "s/\{\{TEST_OUTPUT\}\}/$OUTPUT/g" index.html
+
 
       - name: Deploy a Cloudflare Pages
         uses: cloudflare/pages-action@v1

@@ -81,36 +81,35 @@ jobs:
           fi
 
           set -e
-
-          # -------------------------------
-          # Genera resumen por clase usando AWK
+          # Genera resumen por clase (✅ o ❌) basado en tu salida de JUnit
           SUMMARY=$(awk '
-          /│  ├─ [A-Za-z0-9_]+ ✔|✘/ {
-              gsub(/│  ├─ | ✔|✘/, "", $0)
+          # Detecta la línea de la clase: empieza con │  ├─ nombre_clase ✔ o ✘
+          /^│  ├─ [A-Za-z0-9_]+ ✔|✘$/ {
+              gsub(/^│  ├─ /, "", $0)
               current_class=$0
               passed=0
               total=0
               next
           }
-          /│  │  ├─ [a-zA-Z0-9_]+\(\) ✔|✘/ {
+
+          # Detecta cada test dentro de la clase: empieza con │  │  ├─ test() ✔ o ✘
+          /^│  │  ├─ .* ✔|✘/ {
               total++
               if ($0 ~ /✔/) passed++
           }
-          /└─/ {
+
+          # Cuando aparece la línea de cierre de clase o siguiente clase
+          /^│  ├─ [A-Za-z0-9_]+ ✔|✘$/ || /^├─/ || /^└─/ {
               if (current_class != "") {
                   status = (passed==total) ? "✅" : "❌"
-                  print status " " current_class " (" passed "/" total ")<br>"
+                  print status " " current_class " (" passed "/" total ")"
                   current_class=""
               }
           }
           ' test_output.txt)
-          echo "DEBUG: Test class summary:"
-          echo "$SUMMARY"
 
-          # Exportar variable para usar en el HTML
+          # Exportar variable para HTML
           echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
-
-      
 
 
       - name: Generar reporte.html final

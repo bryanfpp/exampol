@@ -2,16 +2,13 @@
 set +e
 echo "🧪 Ejecutando tests y generando summary..."
 
-# Crear carpetas necesarias
 mkdir -p bin testbin reports
 
-# Compilar src/*.java
-echo "Compilando src/*.java..."
+# Compilar código fuente
 find src -name "*.java" > sources.txt
 javac -d bin @sources.txt || { echo "Error compilando src"; exit 1; }
 
-# Compilar tests/*.java
-echo "Compilando tests/*.java..."
+# Compilar tests
 if ls tests/*.java >/dev/null 2>&1; then
     find tests -name "*.java" > test_sources.txt
     javac -cp "bin:lib/junit-platform-console-standalone-1.9.3.jar" -d testbin @test_sources.txt || echo "Error compilando tests"
@@ -19,11 +16,11 @@ else
     echo "⚠️ No hay archivos de test en tests/"
 fi
 
-# Ejecutar todos los tests de JUnit 5 y guardar salida
+# Ejecutar todos los tests con detalles en tree
 TEST_OUTPUT=$(java -jar lib/junit-platform-console-standalone-1.9.3.jar \
     --class-path "bin:testbin" \
     --scan-class-path \
-    --details=none 2>&1)
+    --details=tree 2>&1)
 
 echo "$TEST_OUTPUT" > reports/test_output.txt
 
@@ -31,28 +28,34 @@ echo "$TEST_OUTPUT" > reports/test_output.txt
 SUMMARY_FILE="reports/test_summary.html"
 echo "" > "$SUMMARY_FILE"
 
-# Extraer resumen por clase
-CLASSES=$(echo "$TEST_OUTPUT" | grep -oP '▶️ Ejecutando \K.*')
-for CLASS in $CLASSES; do
-    # Contar tests pasados/fallidos en la sección de esta clase
-    SECTION=$(echo "$TEST_OUTPUT" | awk "/▶️ Ejecutando $CLASS/,/▶️ Ejecutando/" | head -n -1)
-    TOTAL_COUNT=$(echo "$SECTION" | grep -c '✔\|✘')
-    FAILED_COUNT=$(echo "$SECTION" | grep -c '✘')
-    PASSED_COUNT=$((TOTAL_COUNT - FAILED_COUNT))
+# Parsear por clase y test
+# Cada línea con ✔ o ✘ representa un test
+# Cada línea sin indentación representa una clase
 
-    if [ "$FAILED_COUNT" -eq 0 ]; then
-        STATUS="✅"
-    else
-        STATUS="❌"
+CURRENT_CLASS=""
+while IFS= read -r line; do
+    if [[ "$line" =~ ^[A-Za-z].* ]]; then
+        CURRENT_CLASS="$line"
+        TOTAL_COUNT=0
+        FAILED_COUNT=0
     fi
-
-    echo "${STATUS} ${CLASS} (${PASSED_COUNT}/${TOTAL_COUNT})<br>" >> "$SUMMARY_FILE"
-done
-
-# Información final en consola
-TOTAL=$(echo "$TEST_OUTPUT" | grep -oP 'tests found\s+\K\d+' | tail -1)
-PASSED=$(echo "$TEST_OUTPUT" | grep -oP 'tests successful\s+\K\d+' | tail -1)
-FAILED=$((TOTAL - PASSED))
+    if [[ "$line" =~ "✔" ]]; then
+        TOTAL_COUNT=$((TOTAL_COUNT + 1))
+    fi
+    if [[ "$line" =~ "✘" ]]; then
+        TOTAL_COUNT=$((TOTAL_COUNT + 1))
+        FAILED_COUNT=$((FAILED_COUNT + 1))
+    fi
+    # Cuando termina la clase o llega a la última línea
+    if [[ "$line" == "" && "$CURRENT_CLASS" != "" ]]; then
+        PASSED_COUNT=$((TOTAL_COUNT - FAILED_COUNT))
+        STATUS="✅"
+        if [ "$FAILED_COUNT" -gt 0 ]; then
+            STATUS="❌"
+        fi
+        echo "${STATUS} ${CURRENT_CLASS} (${PASSED_COUNT}/${TOTAL_COUNT})<br>" >> "$SUMMARY_FILE"
+        CURRENT_CLASS=""
+    fi
+done <<< "$TEST_OUTPUT"
 
 echo "✅ test_summary.html generado en $SUMMARY_FILE"
-echo "Total: $TOTAL, Passed: $PASSED, Failed: $FAILED"

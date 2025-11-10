@@ -32,6 +32,7 @@ jobs:
             javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:bin" -d testbin tests/*.java
           else
             echo "⚠️ No hay archivos de test en tests/"
+          fi
 
       - name: Información del commit
         id: commit_info
@@ -97,8 +98,10 @@ jobs:
 
       - name: Generar reporte.html final
         env:
-          TEST_CLASS_SUMMARY: ${{ steps.test_summary.outputs.TEST_CLASS_SUMMARY }}
+          TEST_CLASS_SUMMARY: ${{ steps.test_summary.outputs.SUMMARY }}
         run: |
+        
+          # YA NO tocamos index.html, solo generamos reporte.html
           cp template_reporte.html reporte.html
 
           STATUS="${{ steps.run_tests.outputs.status }}"
@@ -125,7 +128,10 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$TEST_CLASS_SUMMARY/g" reporte.html
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$SUMMARY/g" reporte.html
+
+
+
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
@@ -133,7 +139,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: exampol
-          directory: ./  
+          directory: ./   # Esto asegura que se publique index.html + reporte.html
 
       - name: Subir reporte de error (si falló)
         if: steps.run_tests.outputs.status == 'failed'

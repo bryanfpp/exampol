@@ -28,7 +28,6 @@ java -jar lib/junit-platform-console-standalone-1.9.3.jar \
     --class-path "bin:testbin" \
     --scan-class-path \
     --reports-dir reports/junit \
-    --fail-if-no-tests false \
     2>&1 | tee reports/test_output.txt
 
 # Parsear cada XML para generar resumen por clase

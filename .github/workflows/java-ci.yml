@@ -81,7 +81,7 @@ jobs:
           fi
           set -e
 
-      - name: Generar TEST_CLASS_SUMMARY
+      - name: Generar SUMMARY
         id: test_summary
         run: |
           # Leer la salida de tests
@@ -97,10 +97,10 @@ jobs:
           SUMMARY_HTML=$(echo "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
 
           # Guardar como variable de salida de GitHub Actions
-          echo "TEST_CLASS_SUMMARY=$SUMMARY_HTML" >> $GITHUB_OUTPUT
+          echo "SUMMARY=$SUMMARY_HTML" >> $GITHUB_OUTPUT
 
           # Mostrar en logs para verificación
-          echo "=== TEST_CLASS_SUMMARY ==="
+          echo "=== SUMMARY ==="
           echo "$SUMMARY_HTML"
           echo "=========================="
 
@@ -137,16 +137,8 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          # Guardamos el contenido en un archivo temporal
-          echo "$TEST_CLASS_SUMMARY" > test_class_summary_tmp.html
-          # Reemplazo seguro de todo el contenido en reporte.html
-          perl -CS -0777 -pe '
-            local $/ = undef;
-            open my $fh, "<", "test_class_summary_tmp.html" or die $!;
-            my $summary = <$fh>;
-            close $fh;
-            s/\{\{TEST_CLASS_SUMMARY\}\}/$summary/g
-          ' reporte.html
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$SUMMARY/g" reporte.html
+
 
 
 

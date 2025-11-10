@@ -55,15 +55,12 @@ jobs:
         run: |
           set +e
 
-          echo "🧪 Ejecutando JUnit..."
           java -jar lib/junit-platform-console-standalone-1.9.3.jar \
             --class-path "bin:testbin" \
             --scan-class-path > test_output.txt 2>&1
 
           TEST_EXIT_CODE=$?
 
-          # Extraer resumen tipo:
-          # "Test run finished after ... 4 tests found, 3 tests started..."
           TOTAL=$(grep -oP "(?<=tests found: )\d+" test_output.txt | head -1)
           PASSED=$(grep -oP "(?<=tests successful: )\d+" test_output.txt | head -1)
           FAILED=$(grep -oP "(?<=tests failed: )\d+" test_output.txt | head -1)
@@ -85,39 +82,9 @@ jobs:
 
           set -e
 
-      - name: Generar reporte de errores (si falló)
-        if: steps.run_tests.outputs.status == 'failed'
-        run: |
-          echo "📝 Generando reporte..."
-
-          cat > error_report.txt << EOF
-          ════════════════════════════════════════════════════════════
-          ❌ REPORTE DE ERRORES - TESTS FALLIDOS
-          ════════════════════════════════════════════════════════════
-
-          Autor: ${{ steps.commit_info.outputs.author_name }}
-          Email: ${{ steps.commit_info.outputs.author_email }}
-          Fecha: ${{ steps.commit_info.outputs.timestamp }}
-          Commit: "${{ steps.commit_info.outputs.commit_message }}"
-          Intento #${{ steps.commit_info.outputs.commit_count }}
-
-          ────────────────────────────────────────────────────────────
-          📊 RESULTADOS
-          ────────────────────────────────────────────────────────────
-          Tests totales: ${{ steps.run_tests.outputs.tests_total }}
-          Pasados: ✅ ${{ steps.run_tests.outputs.tests_passed }}
-          Fallidos: ❌ ${{ steps.run_tests.outputs.tests_failed }}
-
-          ────────────────────────────────────────────────────────────
-          🔍 DETALLES DE SALIDA DEL TEST
-          ────────────────────────────────────────────────────────────
-
-          EOF
-
-          cat test_output.txt >> error_report.txt
-
       - name: Generar index.html final
         run: |
+          # Ahora SIEMPRE usamos template_reporte.html como base
           cp template_reporte.html index.html
 
           STATUS="${{ steps.run_tests.outputs.status }}"
@@ -127,16 +94,13 @@ jobs:
           MESSAGE="${{ steps.commit_info.outputs.commit_message }}"
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
-
-          # Limpiar códigos ANSI
-          CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
-
-          # Reemplazar saltos de línea
-          OUTPUT=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
-
-          # Escapar caracteres para que no rompan perl
-          SAFE_OUTPUT=$(printf "%s" "$OUTPUT" | sed 's/[&/]/\\&/g')
           
+          FAILED=$((TOTAL - PASSED))
+
+          CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
+          OUTPUT=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
+          SAFE_OUTPUT=$(printf "%s" "$OUTPUT" | sed 's/[&/]/\\&/g')
+
           perl -CS -pi -e "s/\{\{STATUS\}\}/$STATUS/g" index.html
           perl -CS -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" index.html
           perl -CS -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" index.html
@@ -144,10 +108,8 @@ jobs:
           perl -CS -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" index.html
           perl -CS -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" index.html
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" index.html
-          FAILED=$((TOTAL - PASSED))
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" index.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" index.html
-
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
@@ -155,9 +117,8 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: exampol
-          directory: ./
-        
-          
+          directory: ./   # ESTO ASEGURA QUE SE PUBLIQUE index.html
+
       - name: Subir reporte de error (si falló)
         if: steps.run_tests.outputs.status == 'failed'
         uses: actions/upload-artifact@v4
@@ -172,6 +133,3 @@ jobs:
           else
             echo "❌ Tests fallaron. Página publicada con reporte."
           fi
-
-     
-  

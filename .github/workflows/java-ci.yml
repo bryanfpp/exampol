@@ -82,6 +82,35 @@ jobs:
           fi
 
           set -e
+          # Genera resumen por clase
+          SUMMARY=""
+          while read -r line; do
+            if [[ "$line" =~ ├─\ ([A-Za-z0-9_]+)\ ✔|✘ ]]; then
+              current_class="${BASH_REMATCH[1]}"
+              passed=0
+              total=0
+            fi
+
+            if [[ "$line" =~ ├─\ ([a-zA-Z0-9_]+)\(\)\ (✔|✘) ]]; then
+              ((total++))
+              [[ "${BASH_REMATCH[2]}" == "✔" ]] && ((passed++))
+            fi
+
+            # Al final de cada clase, agrega al resumen
+            if [[ "$line" =~ └─ ]] && [[ -n "$current_class" ]]; then
+              if [[ $passed -eq $total ]]; then
+                STATUS="✅"
+              else
+                STATUS="❌"
+              fi
+              SUMMARY+="$STATUS $current_class ($passed/$total)<br>"
+              current_class=""
+            fi
+          done < test_output.txt
+
+          # Exportar variable para usar en perl
+          echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
+
 
       - name: Generar reporte.html final
         run: |
@@ -111,6 +140,8 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$SUMMARY/g" reporte.html
+
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1

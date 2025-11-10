@@ -33,6 +33,7 @@
   <p><strong>Total de tests:</strong> {{TESTS_TOTAL}}</p>
   <p><strong>Tests exitosos:</strong> ✅ {{TESTS_PASSED}}</p>
   <p><strong>Tests fallidos:</strong> ❌ {{TESTS_FAILED}}</p>
+  
 </div>
 
         </div>
@@ -78,6 +79,10 @@
 
         </div>
     </div>
+            <div id="resumenClases">
+                {{TEST_CLASS_SUMMARY}}
+            </div>
+
 
     <script>
         const status = '{{STATUS}}'.toLowerCase();

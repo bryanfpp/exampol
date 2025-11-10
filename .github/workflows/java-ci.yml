@@ -111,8 +111,6 @@ jobs:
           MESSAGE="${{ steps.commit_info.outputs.commit_message }}"
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
-          SUMMARY="${{ steps.run_tests.outputs.test_class_summary }}"
-
           FAILED=$((TOTAL - PASSED))
 
           CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)

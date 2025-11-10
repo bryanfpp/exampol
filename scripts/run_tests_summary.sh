@@ -32,7 +32,10 @@ for TESTFILE in $(find tests -name "*.java"); do
 
     # Ejecutar test con JUnit 5 ConsoleLauncher
     OUTPUT=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" \
-        org.junit.platform.console.ConsoleLauncher -c "$TESTNAME" 2>&1 || true)
+        org.junit.platform.console.ConsoleLauncher \
+        --class-path "bin:testbin" \
+        --scan-class-path \
+        --include-classname ".*$TESTNAME" 2>&1 || true)
 
     # Extraer totales de la salida
     TOTAL_TESTS=$(echo "$OUTPUT" | grep -oP 'Tests found: \K\d+' | head -1)

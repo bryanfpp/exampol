@@ -1,24 +1,24 @@
-name: Java CI
+name: Test y Deploy OOP Exercise Java
 
 on:
   push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    branches: [ master, main ]
 
 jobs:
-  build-test:
+  test-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
-        uses: actions/checkout@v4
 
-      - name: Instalar Java 21
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: "21"
-          distribution: "temurin"
+          java-version: '21'
+          distribution: 'temurin'
 
       - name: Compilar código fuente
         run: |
@@ -31,37 +31,133 @@ jobs:
           if ls tests/*.java >/dev/null 2>&1; then
             javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:bin" -d testbin tests/*.java
           else
-            echo "⚠️ No se encontraron tests"
+            echo "⚠️ No hay archivos de test en tests/"
           fi
 
-      - name: Ejecutar tests y generar salida
-        id: run_tests
+      - name: Información del commit
+        id: commit_info
         run: |
-          java -jar lib/junit-platform-console-standalone-1.9.3.jar \
-          --class-path "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" \
-          --scan-class-path > test_output.txt || true
+          AUTHOR_NAME="${{ github.event.head_commit.author.name }}"
+          AUTHOR_EMAIL="${{ github.event.head_commit.author.email }}"
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          COMMIT_COUNT=$(git rev-list --count HEAD)
 
-      - name: Preparar reporte HTML
+          echo "author_name=$AUTHOR_NAME" >> $GITHUB_OUTPUT
+          echo "author_email=$AUTHOR_EMAIL" >> $GITHUB_OUTPUT
+          echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Ejecutar Tests Java
+        id: run_tests
+        continue-on-error: true
+        run: |
+          set +e
+
+          echo "🧪 Ejecutando JUnit..."
+          java -jar lib/junit-platform-console-standalone-1.9.3.jar \
+            --class-path "bin:testbin" \
+            --scan-class-path > test_output.txt 2>&1
+
+          TEST_EXIT_CODE=$?
+
+          # Extraer resumen tipo:
+          # "Test run finished after ... 4 tests found, 3 tests started..."
+          TOTAL=$(grep -oP "(?<=tests found: )\d+" test_output.txt | head -1)
+          PASSED=$(grep -oP "(?<=tests successful: )\d+" test_output.txt | head -1)
+          FAILED=$(grep -oP "(?<=tests failed: )\d+" test_output.txt | head -1)
+
+          TOTAL=${TOTAL:-0}
+          PASSED=${PASSED:-0}
+          FAILED=${FAILED:-0}
+
+          echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "tests_passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+
+          if [ "$TEST_EXIT_CODE" -eq 0 ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+          fi
+
+          set -e
+
+      - name: Generar reporte de errores (si falló)
+        if: steps.run_tests.outputs.status == 'failed'
+        run: |
+          echo "📝 Generando reporte..."
+
+          cat > error_report.txt << EOF
+          ════════════════════════════════════════════════════════════
+          ❌ REPORTE DE ERRORES - TESTS FALLIDOS
+          ════════════════════════════════════════════════════════════
+
+          Autor: ${{ steps.commit_info.outputs.author_name }}
+          Email: ${{ steps.commit_info.outputs.author_email }}
+          Fecha: ${{ steps.commit_info.outputs.timestamp }}
+          Commit: "${{ steps.commit_info.outputs.commit_message }}"
+          Intento #${{ steps.commit_info.outputs.commit_count }}
+
+          ────────────────────────────────────────────────────────────
+          📊 RESULTADOS
+          ────────────────────────────────────────────────────────────
+          Tests totales: ${{ steps.run_tests.outputs.tests_total }}
+          Pasados: ✅ ${{ steps.run_tests.outputs.tests_passed }}
+          Fallidos: ❌ ${{ steps.run_tests.outputs.tests_failed }}
+
+          ────────────────────────────────────────────────────────────
+          🔍 DETALLES DE SALIDA DEL TEST
+          ────────────────────────────────────────────────────────────
+
+          EOF
+
+          cat test_output.txt >> error_report.txt
+
+      - name: Generar index.html final
         run: |
           cp template_reporte.html index.html
 
-          AUTHOR="$(git log -1 --pretty=format:'%an')"
-          EMAIL="$(git log -1 --pretty=format:'%ae')"
-          DATE="$(git log -1 --pretty=format:'%ad')"
-          MESSAGE="$(git log -1 --pretty=format:'%s')"
+          STATUS="${{ steps.run_tests.outputs.status }}"
+          AUTHOR="${{ steps.commit_info.outputs.author_name }}"
+          EMAIL="${{ steps.commit_info.outputs.author_email }}"
+          DATE="${{ steps.commit_info.outputs.timestamp }}"
+          MESSAGE="${{ steps.commit_info.outputs.commit_message }}"
+          PASSED="${{ steps.run_tests.outputs.tests_passed }}"
+          TOTAL="${{ steps.run_tests.outputs.tests_total }}"
 
-          sed -i "s/{{AUTHOR}}/$AUTHOR/" index.html
-          sed -i "s/{{EMAIL}}/$EMAIL/" index.html
-          sed -i "s/{{DATE}}/$DATE/" index.html
-          sed -i "s/{{MESSAGE}}/$MESSAGE/" index.html
+          OUTPUT=$(sed ':a;N;$!ba;s/\n/<br>/g' test_output.txt)
 
-          OUTPUT=$(sed 's/"/\\"/g' test_output.txt | sed ':a;N;$!ba;s/\n/<br>/g')
-          sed -i "s|{{TEST_OUTPUT}}|$OUTPUT|" index.html
+          perl -pi -e "s/\{\{STATUS\}\}/$STATUS/g" index.html
+          perl -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" index.html
+          perl -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" index.html
+          perl -pi -e "s/\{\{DATE\}\}/$DATE/g" index.html
+          perl -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" index.html
+          perl -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" index.html
+          perl -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" index.html
+          perl -pi -e "s/\{\{TEST_OUTPUT\}\}/$OUTPUT/g" index.html
 
-      - name: Guardar artefactos
+      - name: Deploy a Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: exampol
+          directory: ./    
+
+      - name: Subir reporte de error (si falló)
+        if: steps.run_tests.outputs.status == 'failed'
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
-          path: |
-            index.html
-            test_output.txt
+          name: error-report-${{ github.run_number }}
+          path: error_report.txt
+
+      - name: Mensaje final
+        run: |
+          if [ "${{ steps.run_tests.outputs.status }}" == "success" ]; then
+            echo "🎉 Tests correctos. Página actualizada."
+          else
+            echo "❌ Tests fallaron. Página publicada con reporte."
+          fi

@@ -84,25 +84,30 @@ jobs:
 
           # -------------------------------
           # Genera resumen por clase usando AWK
-          SUMMARY=$(grep -E '^[├└│].*✔|✘' test_output.txt | awk '
-          /├─ [A-Za-z0-9_]+ ✔|✘/ { 
-              gsub(/├─ | ✔|✘/, "", $0); 
-              current_class=$0; passed=0; total=0; next
+          SUMMARY=$(awk '
+          /│  ├─ [A-Za-z0-9_]+ ✔|✘/ {
+              gsub(/│  ├─ | ✔|✘/, "", $0)
+              current_class=$0
+              passed=0
+              total=0
+              next
           }
-          /│  ├─ [a-zA-Z0-9_]+\(\) ✔/ { passed++; total++ }
-          /│  ├─ [a-zA-Z0-9_]+\(\) ✘/ { total++ }
+          /│  │  ├─ [a-zA-Z0-9_]+\(\) ✔|✘/ {
+              total++
+              if ($0 ~ /✔/) passed++
+          }
           /└─/ {
               if (current_class != "") {
-                  status = (passed==total) ? "✅" : "❌";
-                  print status " " current_class " (" passed "/" total ")<br>";
-                  current_class="";
+                  status = (passed==total) ? "✅" : "❌"
+                  print status " " current_class " (" passed "/" total ")<br>"
+                  current_class=""
               }
           }
-          ')
           ' test_output.txt)
-
           # Exportar variable para usar en el HTML
-          echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
+          SAFE_SUMMARY=$(printf "%s" "$SUMMARY" | sed 's/[&/\]/\\&/g')
+          echo "test_class_summary=$SAFE_SUMMARY" >> $GITHUB_OUTPUT
+
       
 
 

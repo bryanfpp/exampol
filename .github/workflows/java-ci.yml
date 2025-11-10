@@ -104,9 +104,11 @@ jobs:
               }
           }
           ' test_output.txt)
+          echo "DEBUG: Test class summary:"
+          echo "$SUMMARY"
+
           # Exportar variable para usar en el HTML
-          SAFE_SUMMARY=$(printf "%s" "$SUMMARY" | sed 's/[&/\]/\\&/g')
-          echo "test_class_summary=$SAFE_SUMMARY" >> $GITHUB_OUTPUT
+          echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
 
       
 

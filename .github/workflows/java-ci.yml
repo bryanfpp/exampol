@@ -29,7 +29,8 @@ jobs:
         run: |
           SUMMARY=$(cat reports/test_summary.html)
           cp template_reporte.html reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$SUMMARY/g" reporte.html    
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/\Q$SUMMARY\E/g" reporte.html
+    
 
       - name: Compilar código fuente
         run: |

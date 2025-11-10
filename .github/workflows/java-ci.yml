@@ -147,13 +147,14 @@ jobs:
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" index.html
 
 
-      - name: Deploy a Cloudflare Pages
+      - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: exampol
-          directory: ./    
+          directory: ./
+        
 
       - name: Subir reporte de error (si falló)
         if: steps.run_tests.outputs.status == 'failed'
@@ -170,12 +171,5 @@ jobs:
             echo "❌ Tests fallaron. Página publicada con reporte."
           fi
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: exampol
-          directory: ./
-          wranglerVersion: 2
+     
   

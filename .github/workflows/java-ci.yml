@@ -82,10 +82,10 @@ jobs:
 
           set -e
 
-      - name: Generar index.html final
+      - name: Generar reporte.html final
         run: |
-          # Ahora SIEMPRE usamos template_reporte.html como base
-          cp template_reporte.html index.html
+          # YA NO tocamos index.html, solo generamos reporte.html
+          cp template_reporte.html reporte.html
 
           STATUS="${{ steps.run_tests.outputs.status }}"
           AUTHOR="${{ steps.commit_info.outputs.author_name }}"
@@ -94,22 +94,22 @@ jobs:
           MESSAGE="${{ steps.commit_info.outputs.commit_message }}"
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
-          
+
           FAILED=$((TOTAL - PASSED))
 
           CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
           OUTPUT=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
           SAFE_OUTPUT=$(printf "%s" "$OUTPUT" | sed 's/[&/]/\\&/g')
 
-          perl -CS -pi -e "s/\{\{STATUS\}\}/$STATUS/g" index.html
-          perl -CS -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" index.html
-          perl -CS -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" index.html
-          perl -CS -pi -e "s/\{\{DATE\}\}/$DATE/g" index.html
-          perl -CS -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" index.html
-          perl -CS -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" index.html
-          perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" index.html
-          perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" index.html
-          perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" index.html
+          perl -CS -pi -e "s/\{\{STATUS\}\}/$STATUS/g" reporte.html
+          perl -CS -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" reporte.html
+          perl -CS -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" reporte.html
+          perl -CS -pi -e "s/\{\{DATE\}\}/$DATE/g" reporte.html
+          perl -CS -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" reporte.html
+          perl -CS -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" reporte.html
+          perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
+          perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
+          perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
@@ -117,7 +117,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: exampol
-          directory: ./   # ESTO ASEGURA QUE SE PUBLIQUE index.html
+          directory: ./   # Esto asegura que se publique index.html + reporte.html
 
       - name: Subir reporte de error (si falló)
         if: steps.run_tests.outputs.status == 'failed'

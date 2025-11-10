@@ -81,9 +81,9 @@ jobs:
           fi
 
           # ---- Capturar toda la salida de los tests como TEST_CLASS_SUMMARY ----
-          TEST_CLASS_SUMMARY=$(cat -v test_output.txt)
+          SUMMARY=$(cat -v test_output.txt)
           echo "test_class_summary<<EOF" >> $GITHUB_OUTPUT
-          echo "$TEST_CLASS_SUMMARY" >> $GITHUB_OUTPUT
+          echo "$SUMMARY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
           set -e
@@ -118,7 +118,7 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/\${{ steps.run_tests.outputs.test_class_summary }}/g" index.html
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$SUMMARY/g" index.html
 
 
 

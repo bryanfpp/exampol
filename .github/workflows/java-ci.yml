@@ -84,24 +84,32 @@ jobs:
       - name: Generar TEST_CLASS_SUMMARY
         id: test_summary
         run: |
-          # Limpiar códigos de color
-          CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
-          
-          # Escapar caracteres peligrosos
-          echo "$CLEAN_OUTPUT" | sed 's/\\/\\\\/g; s/\//\\\//g; s/&/\\&/g' > test_summary_escaped.txt
-          
+          # Leer la salida de tests
+          RAW_OUTPUT=$(cat test_output.txt)
+
+          # Eliminar secuencias ANSI (colores, estilos, etc.)
+          CLEAN_OUTPUT=$(echo "$RAW_OUTPUT" | sed 's/\x1B\[[0-9;]*[A-Za-z]//g')
+
+          # Eliminar caracteres no imprimibles excepto saltos de línea
+          CLEAN_OUTPUT=$(echo "$CLEAN_OUTPUT" | tr -cd '\11\12\15\40-\176')
+
+          # Convertir saltos de línea a <br> para HTML
+          SUMMARY_HTML=$(echo "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
+
           # Guardar como variable de salida de GitHub Actions
-          SUMMARY=$(cat test_summary_escaped.txt | awk '{printf "%s<br>", $0}')
-          echo "TEST_CLASS_SUMMARY=$SUMMARY" >> $GITHUB_OUTPUT
-          
+          echo "TEST_CLASS_SUMMARY=$SUMMARY_HTML" >> $GITHUB_OUTPUT
+
           # Mostrar en logs para verificación
           echo "=== TEST_CLASS_SUMMARY ==="
-          cat test_summary_escaped.txt
+          echo "$SUMMARY_HTML"
           echo "=========================="
 
 
       - name: Generar reporte.html final
+        env:
+          TEST_CLASS_SUMMARY: ${{ steps.test_summary.outputs.TEST_CLASS_SUMMARY }}
         run: |
+        
           # YA NO tocamos index.html, solo generamos reporte.html
           cp template_reporte.html reporte.html
 
@@ -129,7 +137,8 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/`cat test_summary_escaped.txt | awk '{printf "%s<br>", $0}'`/g" reporte.html
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$TEST_CLASS_SUMMARY/g" reporte.html
+
 
 
 

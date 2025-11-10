@@ -29,7 +29,6 @@ jobs:
         run: |
           SUMMARY=$(cat reports/test_summary.html)
           cp template_reporte.html reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/\Q$SUMMARY\E/g" reporte.html
     
 
       - name: Compilar código fuente
@@ -123,8 +122,15 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/\Q$SUMMARY\E/g" reporte.html
-
+          perl -CS -0777 -pe '
+                BEGIN { 
+                  open my $fh, "<", "reports/test_summary.html" or die $!; 
+                  local $/; 
+                  $summary = <$fh>; 
+                  close $fh; 
+                }
+                s/\{\{TEST_CLASS_SUMMARY\}\}/$summary/g;
+              ' reporte.html
 
 
 

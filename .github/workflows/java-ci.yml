@@ -79,15 +79,24 @@ jobs:
           else
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
-
-          # ---- Capturar toda la salida de los tests como TEST_CLASS_SUMMARY ----
-          SUMMARY=$(cat -v test_output.txt)
-          echo "test_class_summary<<EOF" >> $GITHUB_OUTPUT
-          echo "$SUMMARY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
           set -e
 
+      - name: Generar TEST_CLASS_SUMMARY
+        id: test_summary
+        run: |
+          # Limpiar códigos de color y caracteres extraños de la salida
+          CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
+          
+          # Escapar caracteres especiales para Perl/HTML y reemplazar saltos de línea por <br>
+          TEST_CLASS_SUMMARY=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g' | sed 's/[&\/]/\\&/g')
+          
+          # Guardar en variable de salida de GitHub Actions
+          echo "TEST_CLASS_SUMMARY=$TEST_CLASS_SUMMARY" >> $GITHUB_OUTPUT
+          
+          # Solo para ver en logs
+          echo "=== TEST_CLASS_SUMMARY ==="
+          echo "$TEST_CLASS_SUMMARY"
+          echo "=========================="
 
       - name: Generar reporte.html final
         run: |
@@ -118,7 +127,7 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$SUMMARY/g" index.html
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$TEST_CLASS_SUMMARY/g" reporte.html
 
 
 

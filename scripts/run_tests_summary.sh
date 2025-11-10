@@ -1,41 +1,47 @@
 #!/bin/bash
 set -e
-
 echo "🧪 Ejecutando tests y generando summary..."
 
 # Crear carpetas necesarias
-mkdir -p reports
+mkdir -p bin
 mkdir -p testbin
+mkdir -p reports
 
-# Compilar tests si existen
+# Compilar código fuente
+echo "Compilando src/*.java..."
+javac -d bin src/*.java
+
+# Compilar tests
 if ls tests/*.java >/dev/null 2>&1; then
-    javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:bin" -d testbin tests/*.java
+    echo "Compilando tests/*.java..."
+    javac -cp "bin:lib/junit-platform-console-standalone-1.9.3.jar" -d testbin tests/*.java
 else
     echo "⚠️ No hay archivos de test en tests/"
     exit 0
 fi
 
-# Limpiar archivo de summary
-> reports/test_summary.html
+# Inicializar resumen
+SUMMARY_FILE="reports/test_summary.html"
+echo "" > "$SUMMARY_FILE"
 
-# Ejecutar cada test individualmente y generar el resumen
-for classfile in testbin/*.class; do
-    classname=$(basename "$classfile" .class)
+# Ejecutar tests uno por uno
+for TESTFILE in tests/*.java; do
+    TESTNAME=$(basename "$TESTFILE" .java)
+    echo "▶️ Ejecutando $TESTNAME ..."
     
-    # Ejecutar la clase de test
-    output=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" org.junit.runner.JUnitCore "$classname" 2>&1)
-
-    # Contar total de tests y fallos
-    total=$(echo "$output" | grep -oP 'Tests run: \K\d+')
-    failures=$(echo "$output" | grep -oP 'Failures: \K\d+')
-    passed=$((total - failures))
-
-    # Marcar ✅ o ❌ según resultados
-    if [ "$failures" -eq 0 ]; then
-        echo "✅ $classname ($passed/$total)" >> reports/test_summary.html
+    OUTPUT=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" org.junit.runner.JUnitCore "$TESTNAME" 2>&1)
+    
+    # Detectar si falló
+    if echo "$OUTPUT" | grep -q "FAILURES!!!"; then
+        echo "❌ $TESTNAME (0/?)" >> "$SUMMARY_FILE"
     else
-        echo "❌ $classname ($passed/$total)" >> reports/test_summary.html
+        # Contar tests ejecutados y exitosos usando JUnit output
+        TOTAL=$(echo "$OUTPUT" | grep -oP "\d+(?=\s+tests)" | head -1)
+        PASSED=$(echo "$OUTPUT" | grep -oP "\d+(?=\s+successful)" | head -1)
+        TOTAL=${TOTAL:-?}
+        PASSED=${PASSED:-?}
+        echo "✅ $TESTNAME ($PASSED/$TOTAL)" >> "$SUMMARY_FILE"
     fi
 done
 
-echo "✅ Summary generado en reports/test_summary.html"
+echo "✅ test_summary.html generado correctamente en reports/"

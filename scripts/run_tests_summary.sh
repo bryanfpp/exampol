@@ -2,9 +2,10 @@
 set +e
 echo "🧪 Ejecutando tests y generando summary..."
 
+# Crear carpetas
 mkdir -p bin testbin reports reports/junit
 
-# Compilar src
+# Compilar código fuente
 find src -name "*.java" > sources.txt
 javac -d bin @sources.txt || { echo "Error compilando src"; exit 1; }
 
@@ -23,18 +24,17 @@ java -jar lib/junit-platform-console-standalone-1.9.3.jar \
     --reports-dir reports/junit \
     --details=none > reports/test_output.txt 2>&1
 
-# Crear summary HTML
+# Crear o limpiar el summary HTML
 SUMMARY_FILE="reports/test_summary.html"
 echo "" > "$SUMMARY_FILE"
 
-# Parsear XML y generar resumen por clase
+# Parsear archivos XML generados
 for xml in reports/junit/*.xml; do
-    if [ ! -f "$xml" ]; then
-        continue
-    fi
-    # Extraer nombre de clase
+    [ -f "$xml" ] || continue
+
+    # Nombre de la clase de test
     CLASS=$(xmllint --xpath 'string(//testsuite/@name)' "$xml")
-    # Contar tests totales y fallidos
+    # Total de tests y fallidos
     TOTAL=$(xmllint --xpath 'string(//testsuite/@tests)' "$xml")
     FAILED=$(xmllint --xpath 'string(//testsuite/@failures)' "$xml")
     PASSED=$((TOTAL - FAILED))
@@ -44,6 +44,7 @@ for xml in reports/junit/*.xml; do
         STATUS="❌"
     fi
 
+    # Escribir en HTML
     echo "${STATUS} ${CLASS} (${PASSED}/${TOTAL})<br>" >> "$SUMMARY_FILE"
 done
 

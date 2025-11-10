@@ -1,9 +1,9 @@
 #!/bin/bash
 set +e
-echo "🧪 Ejecutando tests y generando summary..."
+echo "🧪 Ejecutando tests y generando summary simplificado..."
 
-# Crear carpetas
-mkdir -p bin testbin reports reports/junit
+# Crear carpetas si no existen
+mkdir -p bin testbin reports
 
 # Compilar código fuente
 find src -name "*.java" > sources.txt
@@ -17,35 +17,29 @@ else
     echo "⚠️ No hay archivos de test en tests/"
 fi
 
-# Ejecutar tests y generar reportes XML
+# Ejecutar tests con JUnit 5
 java -jar lib/junit-platform-console-standalone-1.9.3.jar \
     --class-path "bin:testbin" \
     --scan-class-path \
-    --reports-dir reports/junit \
     --details=none > reports/test_output.txt 2>&1
 
-# Crear o limpiar el summary HTML
+# Crear o limpiar test_summary.html
 SUMMARY_FILE="reports/test_summary.html"
 echo "" > "$SUMMARY_FILE"
 
-# Parsear archivos XML generados
-for xml in reports/junit/*.xml; do
-    [ -f "$xml" ] || continue
+# Listar clases de test y mostrar solo ✅/❌ sin totales
+for TESTFILE in $(find tests -name "*.java"); do
+    TESTNAME=$(basename "$TESTFILE" .java)
 
-    # Nombre de la clase de test
-    CLASS=$(xmllint --xpath 'string(//testsuite/@name)' "$xml")
-    # Total de tests y fallidos
-    TOTAL=$(xmllint --xpath 'string(//testsuite/@tests)' "$xml")
-    FAILED=$(xmllint --xpath 'string(//testsuite/@failures)' "$xml")
-    PASSED=$((TOTAL - FAILED))
-
-    STATUS="✅"
-    if [ "$FAILED" -gt 0 ]; then
+    # Verificar si hay fallo en el output
+    if grep -q "Failures.*$TESTNAME" reports/test_output.txt; then
         STATUS="❌"
+    else
+        STATUS="✅"
     fi
 
-    # Escribir en HTML
-    echo "${STATUS} ${CLASS} (${PASSED}/${TOTAL})<br>" >> "$SUMMARY_FILE"
+    # Escribir en HTML sin totales
+    echo "${STATUS} ${TESTNAME}<br>" >> "$SUMMARY_FILE"
 done
 
 echo "✅ test_summary.html generado en $SUMMARY_FILE"

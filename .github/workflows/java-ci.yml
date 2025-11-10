@@ -84,19 +84,21 @@ jobs:
       - name: Generar TEST_CLASS_SUMMARY
         id: test_summary
         run: |
-          # Limpiar códigos de color y caracteres extraños de la salida
+          # Limpiar códigos de color
           CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
           
-          # Escapar caracteres especiales para Perl/HTML y reemplazar saltos de línea por <br>
-          TEST_CLASS_SUMMARY=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g' | sed 's/[&\/]/\\&/g')
+          # Escapar caracteres peligrosos
+          echo "$CLEAN_OUTPUT" | sed 's/\\/\\\\/g; s/\//\\\//g; s/&/\\&/g' > test_summary_escaped.txt
           
-          # Guardar en variable de salida de GitHub Actions
-          echo "TEST_CLASS_SUMMARY=$TEST_CLASS_SUMMARY" >> $GITHUB_OUTPUT
+          # Guardar como variable de salida de GitHub Actions
+          SUMMARY=$(cat test_summary_escaped.txt | awk '{printf "%s<br>", $0}')
+          echo "TEST_CLASS_SUMMARY=$SUMMARY" >> $GITHUB_OUTPUT
           
-          # Solo para ver en logs
+          # Mostrar en logs para verificación
           echo "=== TEST_CLASS_SUMMARY ==="
-          echo "$TEST_CLASS_SUMMARY"
+          cat test_summary_escaped.txt
           echo "=========================="
+
 
       - name: Generar reporte.html final
         run: |
@@ -127,7 +129,7 @@ jobs:
           perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" reporte.html
           perl -CS -pi -e "s/\{\{TESTS_FAILED\}\}/$FAILED/g" reporte.html
           perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" reporte.html
-          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/$TEST_CLASS_SUMMARY/g" reporte.html
+          perl -CS -pi -e "s/\{\{TEST_CLASS_SUMMARY\}\}/`cat test_summary_escaped.txt | awk '{printf "%s<br>", $0}'`/g" reporte.html
 
 
 

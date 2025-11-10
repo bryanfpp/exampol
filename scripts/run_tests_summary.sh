@@ -2,9 +2,9 @@
 set +e
 echo "🧪 Ejecutando tests y generando summary..."
 
-mkdir -p bin testbin reports
+mkdir -p bin testbin reports reports/junit
 
-# Compilar código fuente
+# Compilar src
 find src -name "*.java" > sources.txt
 javac -d bin @sources.txt || { echo "Error compilando src"; exit 1; }
 
@@ -16,46 +16,35 @@ else
     echo "⚠️ No hay archivos de test en tests/"
 fi
 
-# Ejecutar todos los tests con detalles en tree
-TEST_OUTPUT=$(java -jar lib/junit-platform-console-standalone-1.9.3.jar \
+# Ejecutar tests y generar reportes XML
+java -jar lib/junit-platform-console-standalone-1.9.3.jar \
     --class-path "bin:testbin" \
     --scan-class-path \
-    --details=tree 2>&1)
+    --reports-dir reports/junit \
+    --details=none > reports/test_output.txt 2>&1
 
-echo "$TEST_OUTPUT" > reports/test_output.txt
-
-# Crear test_summary.html vacío
+# Crear summary HTML
 SUMMARY_FILE="reports/test_summary.html"
 echo "" > "$SUMMARY_FILE"
 
-# Parsear por clase y test
-# Cada línea con ✔ o ✘ representa un test
-# Cada línea sin indentación representa una clase
+# Parsear XML y generar resumen por clase
+for xml in reports/junit/*.xml; do
+    if [ ! -f "$xml" ]; then
+        continue
+    fi
+    # Extraer nombre de clase
+    CLASS=$(xmllint --xpath 'string(//testsuite/@name)' "$xml")
+    # Contar tests totales y fallidos
+    TOTAL=$(xmllint --xpath 'string(//testsuite/@tests)' "$xml")
+    FAILED=$(xmllint --xpath 'string(//testsuite/@failures)' "$xml")
+    PASSED=$((TOTAL - FAILED))
 
-CURRENT_CLASS=""
-while IFS= read -r line; do
-    if [[ "$line" =~ ^[A-Za-z].* ]]; then
-        CURRENT_CLASS="$line"
-        TOTAL_COUNT=0
-        FAILED_COUNT=0
+    STATUS="✅"
+    if [ "$FAILED" -gt 0 ]; then
+        STATUS="❌"
     fi
-    if [[ "$line" =~ "✔" ]]; then
-        TOTAL_COUNT=$((TOTAL_COUNT + 1))
-    fi
-    if [[ "$line" =~ "✘" ]]; then
-        TOTAL_COUNT=$((TOTAL_COUNT + 1))
-        FAILED_COUNT=$((FAILED_COUNT + 1))
-    fi
-    # Cuando termina la clase o llega a la última línea
-    if [[ "$line" == "" && "$CURRENT_CLASS" != "" ]]; then
-        PASSED_COUNT=$((TOTAL_COUNT - FAILED_COUNT))
-        STATUS="✅"
-        if [ "$FAILED_COUNT" -gt 0 ]; then
-            STATUS="❌"
-        fi
-        echo "${STATUS} ${CURRENT_CLASS} (${PASSED_COUNT}/${TOTAL_COUNT})<br>" >> "$SUMMARY_FILE"
-        CURRENT_CLASS=""
-    fi
-done <<< "$TEST_OUTPUT"
+
+    echo "${STATUS} ${CLASS} (${PASSED}/${TOTAL})<br>" >> "$SUMMARY_FILE"
+done
 
 echo "✅ test_summary.html generado en $SUMMARY_FILE"

@@ -80,12 +80,16 @@ jobs:
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
 
-          # -----------------------------
-          # LIMPIAR CARACTERES ESPECIALES
+          # Asegúrate de que test_output.txt existe
+          if [ ! -f test_output.txt ]; then
+            echo "❌ test_output.txt no existe. Asegúrate de ejecutar los tests primero."
+            exit 1
+          fi
+
+          # Limpiar caracteres especiales de caja
           cat test_output.txt | sed 's/├─/ /g; s/│/ /g; s/└─/ /g' > test_clean.txt
 
-          # -----------------------------
-          # IMPRIMIR EL CONTENIDO LIMPIO PARA DEPURAR
+          # Mostrar el contenido limpio
           echo "=== CONTENIDO LIMPIO ==="
           cat test_clean.txt
           echo "========================"
@@ -107,6 +111,7 @@ jobs:
           MESSAGE="${{ steps.commit_info.outputs.commit_message }}"
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
+          SUMMARY="${{ steps.run_tests.outputs.test_class_summary }}"
 
           FAILED=$((TOTAL - PASSED))
 

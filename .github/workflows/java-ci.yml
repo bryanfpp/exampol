@@ -84,15 +84,13 @@ jobs:
 
           # -------------------------------
           # Genera resumen por clase usando AWK
-          SUMMARY=$(awk '
+          SUMMARY=$(grep -E '^[├└│].*✔|✘' test_output.txt | awk '
           /├─ [A-Za-z0-9_]+ ✔|✘/ { 
               gsub(/├─ | ✔|✘/, "", $0); 
               current_class=$0; passed=0; total=0; next
           }
-          /│  ├─ [a-zA-Z0-9_]+\(\) ✔|✘/ {
-              total++;
-              if ($0 ~ /✔/) passed++;
-          }
+          /│  ├─ [a-zA-Z0-9_]+\(\) ✔/ { passed++; total++ }
+          /│  ├─ [a-zA-Z0-9_]+\(\) ✘/ { total++ }
           /└─/ {
               if (current_class != "") {
                   status = (passed==total) ? "✅" : "❌";
@@ -100,6 +98,7 @@ jobs:
                   current_class="";
               }
           }
+          ')
           ' test_output.txt)
 
           # Exportar variable para usar en el HTML

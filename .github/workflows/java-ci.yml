@@ -1,136 +1,94 @@
-name: Test y Deploy Java OOP Exercise
+name: Java CI Cloudflare
 
 on:
   push:
-    branches: [ master, main ]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  test-and-deploy:
+  build-test-deploy:
     runs-on: ubuntu-latest
-    steps:
-      # 1️⃣ Clonar el repositorio
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # 2️⃣ Instalar Java (ej. JDK 17)
-      - name: Setup Java
+    steps:
+      - name: 1. Obtener repo
+        uses: actions/checkout@v3
+
+      - name: 2. Obtener metadata del commit
+        id: commit_data
+        run: |
+          echo "USER_NAME=$(git log -1 --pretty=format:'%an')" >> $GITHUB_OUTPUT
+          echo "EMAIL=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_OUTPUT
+          echo "MESSAGE=$(git log -1 --pretty=format:'%s')" >> $GITHUB_OUTPUT
+          echo "DATE=$(git log -1 --pretty=format:'%ad')" >> $GITHUB_OUTPUT
+          echo "ISCORRECT=true" >> $GITHUB_OUTPUT      
+
+      - name: 3. Instalar Java 21
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
-      # 3️⃣ Compilar proyecto y descargar dependencias (Maven)
-      - name: Build with Maven
-        run: mvn clean compile
-
-      # 4️⃣ Obtener información del commit
-      - name: Obtener información del commit
-        id: commit_info
+      - name: 4. Crear carpetas necesarias
         run: |
-          AUTHOR_NAME="${{ github.event.head_commit.author.name }}"
-          AUTHOR_EMAIL="${{ github.event.head_commit.author.email }}"
-          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          COMMIT_COUNT=$(git rev-list --count HEAD)
+          mkdir -p bin
 
-          echo "author_name=$AUTHOR_NAME" >> $GITHUB_OUTPUT
-          echo "author_email=$AUTHOR_EMAIL" >> $GITHUB_OUTPUT
-          echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
-          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
-          echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+      - name: 5. Compilar código Java
+        run: |
+          echo "Compilando archivos en src/"
+          javac -d bin src/*.java
 
-      # 5️⃣ Ejecutar tests con Maven (JUnit)
-      - name: Ejecutar Tests de Java
-        id: run_tests
+      - name: 6. Ejecutar tests con JUnit Console Launcher
         continue-on-error: true
+        id: junit_run
         run: |
-          echo "🧪 Ejecutando tests..."
-          mvn test > test_output.txt 2>&1
-          TEST_EXIT_CODE=$?
+          echo "Ejecutando tests..."
+          java -jar lib/junit-platform-console-standalone-1.9.3.jar -cp "bin" --scan-class-path > test_output.txt 2>&1
+          
+          # Guardar salida para reporte
+          echo "=== RESULTADO DEL TEST ==="
+          cat test_output.txt
 
-          # Contar tests pasados y fallidos
-          PASSED=$(grep -oP '(?<=Tests run: )[0-9]+(?=, Failures: 0, Errors: 0)' test_output.txt || echo "0")
-          FAILED=$(grep -oP '(?<=Failures: )[0-9]+' test_output.txt || echo "0")
-          TOTAL=$((PASSED + FAILED))
-
-          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
-          echo "tests_passed=$PASSED" >> $GITHUB_OUTPUT
-          echo "tests_failed=$FAILED" >> $GITHUB_OUTPUT
-          echo "tests_total=$TOTAL" >> $GITHUB_OUTPUT
-
-          if [ $TEST_EXIT_CODE -eq 0 ]; then
-            echo "status=success" >> $GITHUB_OUTPUT
-            echo "✅ Todos los tests pasaron: $PASSED/$TOTAL"
+      - name: 7. Evaluar resultados de los tests
+        id: test_eval
+        run: |
+          if grep -q "FAILURE" test_output.txt || grep -q "FAILED" test_output.txt; then
+            echo "TEST_RESULT=FAILED" >> $GITHUB_OUTPUT
           else
-            echo "status=failed" >> $GITHUB_OUTPUT
-            echo "❌ Tests fallidos: $FAILED/$TOTAL"
+            echo "TEST_RESULT=PASSED" >> $GITHUB_OUTPUT
           fi
 
-      # 6️⃣ Generar reporte de errores
-      - name: Generar reporte de errores (si falló)
-        if: steps.run_tests.outputs.status == 'failed'
+      - name: 8. Preparar reporte HTML
         run: |
-          cat > error_report.txt << 'EOF'
-════════════════════════════════════════════════════════════════
-❌ REPORTE DE ERROR - Tests Fallidos
-════════════════════════════════════════════════════════════════
+          TEST_RESULT="${{ steps.test_eval.outputs.TEST_RESULT }}"
+          NAME="${{ steps.commit_data.outputs.USER_NAME }}"
+          EMAIL="${{ steps.commit_data.outputs.EMAIL }}"
+          MESSAGE="${{ steps.commit_data.outputs.MESSAGE }}"
+          DATE="${{ steps.commit_data.outputs.DATE }}"
 
-Desarrollador: ${{ steps.commit_info.outputs.author_name }}
-Email: ${{ steps.commit_info.outputs.author_email }}
-Fecha/Hora: ${{ steps.commit_info.outputs.timestamp }}
-Intento #: ${{ steps.commit_info.outputs.commit_count }}
-Mensaje del commit: "${{ steps.commit_info.outputs.commit_message }}"
+          cp templante_reporte.html index.html
 
-📊 RESUMEN DE TESTS
-Total de tests: ${{ steps.run_tests.outputs.tests_total }}
-Tests pasados: ✅ ${{ steps.run_tests.outputs.tests_passed }}
-Tests fallidos: ❌ ${{ steps.run_tests.outputs.tests_failed }}
+          sed -i "s/{{STATUS}}/$TEST_RESULT/" index.html
+          sed -i "s/{{AUTHOR}}/$NAME/" index.html
+          sed -i "s/{{EMAIL}}/$EMAIL/" index.html
+          sed -i "s/{{MESSAGE}}/$MESSAGE/" index.html
+          sed -i "s/{{DATE}}/$DATE/" index.html
 
-🔍 DETALLES DEL ERROR
-EOF
-          cat test_output.txt >> error_report.txt
-          cat error_report.txt
+          # Insertar salida de tests en la sección {{TEST_OUTPUT}}
+          OUTPUT=$(sed 's/"/\\"/g' test_output.txt | sed ':a;N;$!ba;s/\n/<br>/g')
+          sed -i "s|{{TEST_OUTPUT}}|$OUTPUT|" index.html
 
-      # 7️⃣ Actualizar index.html con resultados
-      - name: Actualizar index.html
-        run: |
-          STATUS="${{ steps.run_tests.outputs.status }}"
-          AUTHOR="${{ steps.commit_info.outputs.author_name }}"
-          EMAIL="${{ steps.commit_info.outputs.author_email }}"
-          TIMESTAMP="${{ steps.commit_info.outputs.timestamp }}"
-          COMMIT_MSG="${{ steps.commit_info.outputs.commit_message }}"
-          COMMIT_NUM="${{ steps.commit_info.outputs.commit_count }}"
-          PASSED="${{ steps.run_tests.outputs.tests_passed }}"
-          TOTAL="${{ steps.run_tests.outputs.tests_total }}"
+      - name: 9. Generar artefactos si fallan
+        if: steps.test_eval.outputs.TEST_RESULT == 'FAILED'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_output
+          path: test_output.txt
 
-          AUTHOR_ESC=$(echo "$AUTHOR" | sed 's/[&/\]/\\&/g')
-          EMAIL_ESC=$(echo "$EMAIL" | sed 's/[&/\]/\\&/g')
-          COMMIT_MSG_ESC=$(echo "$COMMIT_MSG" | sed 's/[&/\]/\\&/g')
-
-          sed -i "s/{{STATUS}}/$STATUS/g" index.html
-          sed -i "s/{{AUTHOR}}/$AUTHOR_ESC/g" index.html
-          sed -i "s/{{EMAIL}}/$EMAIL_ESC/g" index.html
-          sed -i "s/{{TIMESTAMP}}/$TIMESTAMP/g" index.html
-          sed -i "s/{{COMMIT_MESSAGE}}/$COMMIT_MSG_ESC/g" index.html
-          sed -i "s/{{COMMIT_COUNT}}/$COMMIT_NUM/g" index.html
-          sed -i "s/{{TESTS_PASSED}}/$PASSED/g" index.html
-          sed -i "s/{{TESTS_TOTAL}}/$TOTAL/g" index.html
-
-      # 8️⃣ Despliegue (Cloudflare Pages)
-      - name: Publicar a Cloudflare Pages
+      - name: 10. Deploy a Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: actions-ejemplo
-          directory: ./
-
-      # 9️⃣ Subir reporte como artifact si falló
-      - name: Subir reporte de errores
-        if: steps.run_tests.outputs.status == 'failed'
-        uses: actions/upload-artifact@v4
-        with:
-          name: error-report-${{ github.run_number }}
-          path: error_report.txt
-          retention-days: 30
+          projectName: "java-tutor"
+          directory: "./"

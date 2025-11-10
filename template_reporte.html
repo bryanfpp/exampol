@@ -2,76 +2,92 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Pruebas - Proyecto Java OOP</title>
+    <title>Reporte de Pruebas - Proyecto Java</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; display:flex; justify-content:center; align-items:center; }
-        .container { background:white; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); max-width:800px; width:100%; overflow:hidden; }
-        .header { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; padding:40px; text-align:center; }
-        .header h1 { font-size:2.5em; margin-bottom:10px; }
-        .status-badge { display:inline-block; padding:15px 30px; border-radius:50px; font-weight:bold; font-size:1.2em; margin:20px 0; }
-        .status-success { background:#10b981; color:white; }
-        .status-failed { background:#ef4444; color:white; }
-        .content { padding:40px; }
-        .info-card { background:#f8fafc; border-left:4px solid #667eea; padding:20px; margin-bottom:20px; border-radius:8px; }
-        .info-row { display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #e2e8f0; }
-        .info-row:last-child { border-bottom:none; }
-        .info-label { font-weight:600; color:#475569; }
-        .info-value { color:#1e293b; text-align:right; max-width:60%; word-break:break-word; }
-        .error-section { background:#fee2e2; border-left:4px solid #ef4444; padding:20px; margin-top:20px; border-radius:8px; }
-        .error-section h3 { color:#991b1b; margin-bottom:15px; }
-        .error-suggestions { list-style:none; padding-left:0; }
-        .error-suggestions li { padding:8px 0; color:#7f1d1d; }
-        .error-suggestions li:before { content:"💡 "; margin-right:8px; }
-        pre { background:#fef3f3; padding:10px; border-radius:5px; overflow:auto; white-space:pre-wrap; word-wrap:break-word; }
-        footer { background:#f8fafc; padding:20px; text-align:center; color:#64748b; font-size:0.9em; margin-top:20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+        .container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 800px; width: 100%; overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .status-badge { display: inline-block; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2em; margin: 20px 0; }
+        .status-success { background: #10b981; color: white; }
+        .status-failed { background: #ef4444; color: white; }
+        .content { padding: 40px; }
+        .info-card { background: #f8fafc; border-left: 4px solid #667eea; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { font-weight: 600; color: #475569; }
+        .info-value { color: #1e293b; text-align: right; max-width: 60%; word-break: break-word; }
+        .error-section { background: #fee2e2; border-left: 4px solid #ef4444; padding: 20px; margin-top: 20px; border-radius: 8px; }
+        .error-section h3 { color: #991b1b; margin-bottom: 15px; }
+        .test-output-box { background: #0f172a; color: #e2e8f0; padding: 20px; margin-top: 20px; border-radius: 8px; font-family: "Consolas", monospace; white-space: pre-wrap; max-height: 350px; overflow-y: auto; }
     </style>
 </head>
 <body>
     <div class="container">
+
         <div class="header">
-            <h1>☕ Reporte de Pruebas (Java)</h1>
-            <div class="status-badge status-{{STATUS}}">{{STATUS}}</div>
+            <h1>☕ Reporte de Pruebas (Java/JUnit)</h1>
+            <p>Resultados de la ejecución de todos los tests del proyecto</p>
+            <div class="status-badge status-{{STATUS}}">
+                {{STATUS}}
+            </div>
         </div>
-
+        
         <div class="content">
-            <div class="info-card">
-                <h2 style="margin-bottom:20px;color:#1e293b;">👤 Información del Commit</h2>
-                <div class="info-row"><span class="info-label">Autor:</span><span class="info-value">{{AUTHOR_NAME}}</span></div>
-                <div class="info-row"><span class="info-label">Email:</span><span class="info-value">{{AUTHOR_EMAIL}}</span></div>
-                <div class="info-row"><span class="info-label">Fecha y Hora:</span><span class="info-value">{{TIMESTAMP}}</span></div>
-                <div class="info-row"><span class="info-label">Mensaje del Commit:</span><span class="info-value">"{{COMMIT_MESSAGE}}"</span></div>
-                <div class="info-row"><span class="info-label">Número de Intento:</span><span class="info-value">#{{COMMIT_COUNT}}</span></div>
-            </div>
 
             <div class="info-card">
-                <h2 style="margin-bottom:20px;color:#1e293b;">🧪 Resultados de Tests</h2>
-                <div class="info-row"><span class="info-label">Tests Pasados:</span><span class="info-value">{{TESTS_PASSED}}/{{TESTS_TOTAL}}</span></div>
-                <div class="info-row"><span class="info-label">Tests Fallidos:</span><span class="info-value">{{TESTS_FAILED}}</span></div>
+                <h2 style="margin-bottom: 20px; color: #1e293b;">👤 Información del Commit</h2>
+
+                <div class="info-row">
+                    <span class="info-label">Autor:</span>
+                    <span class="info-value">{{AUTHOR}}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Correo:</span>
+                    <span class="info-value">{{EMAIL}}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Fecha y Hora:</span>
+                    <span class="info-value">{{DATE}}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">Mensaje del Commit:</span>
+                    <span class="info-value">"{{MESSAGE}}"</span>
+                </div>
             </div>
 
-            <div class="error-section" id="errorSection" style="display:none;">
-                <h3>⚠️ Detalles y Sugerencias de Error</h3>
-                <ul class="error-suggestions">
-                    <li>Revisa los archivos modificados en <code>src/</code></li>
-                    <li>Asegúrate de que los nombres de clases y métodos coincidan</li>
-                    <li>Verifica que los métodos tengan la firma correcta según JUnit</li>
-                    <li>Confirma que las anotaciones <code>@Test</code> estén presentes</li>
+            <div id="errorSection" class="error-section" style="display: none;">
+                <h3>⚠️ Sugerencias para Resolver los Errores</h3>
+                <ul>
+                    <li>Revisa los archivos .java y los Test...java.</li>
+                    <li>Verifica que los métodos tengan anotaciones @Test.</li>
+                    <li>Descarga <code>test_output.txt</code> desde los artefactos para ver los detalles.</li>
                 </ul>
-                <pre>{{TEST_LOG}}</pre>
             </div>
-        </div>
 
-        <footer>
-            🚀 Generado automáticamente desde GitHub Actions
-        </footer>
+            <div class="test-output-box">
+                {{TEST_OUTPUT}}
+            </div>
+
+        </div>
     </div>
 
     <script>
-        const status = '{{STATUS}}';
-        if(status==='failed'){ document.getElementById('errorSection').style.display='block'; }
-        const badge=document.querySelector('.status-badge');
-        badge.textContent = status==='success' ? '✅ TODOS LOS TESTS PASARON' : '❌ TESTS FALLIDOS';
+        const status = '{{STATUS}}'.toLowerCase();
+        if (status === 'failed') {
+            document.getElementById('errorSection').style.display = 'block';
+        }
+
+        const badge = document.querySelector('.status-badge');
+        if (status === 'success') {
+            badge.textContent = '✅ TODOS LOS TESTS PASARON';
+        } else {
+            badge.textContent = '❌ TESTS FALLIDOS';
+        }
     </script>
 </body>
 </html>

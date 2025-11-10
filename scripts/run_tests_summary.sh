@@ -1,33 +1,41 @@
 #!/bin/bash
-echo "🧪 Ejecutando tests..."
+set -e
 
-mkdir -p bin
-javac -d bin -cp "lib/*" src/*.java tests/*.java
+echo "🧪 Ejecutando tests y generando summary..."
 
-# Inicializar resumen
-SUMMARY=""
-FAILED_TOTAL=0
-PASSED_TOTAL=0
+# Crear carpetas necesarias
+mkdir -p reports
+mkdir -p testbin
 
-# Ejecutar cada test de la carpeta
-for TESTFILE in tests/*.java; do
-  TESTNAME=$(basename "$TESTFILE" .java)
-  
-  OUTPUT=$(java -cp "lib/*:bin" org.junit.runner.JUnitCore "$TESTNAME" 2>&1)
-  TOTAL_TESTS=$(echo "$OUTPUT" | grep -oP "Tests run: \K\d+" | head -1)
-  FAILS=$(echo "$OUTPUT" | grep -oP "Failures: \K\d+" | head -1)
+# Compilar tests si existen
+if ls tests/*.java >/dev/null 2>&1; then
+    javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:bin" -d testbin tests/*.java
+else
+    echo "⚠️ No hay archivos de test en tests/"
+    exit 0
+fi
 
-  PASSED=$((TOTAL_TESTS - FAILS))
-  
-  if [ "$FAILS" -eq 0 ]; then
-    SUMMARY+="✅ $TESTNAME ($PASSED/$TOTAL_TESTS)<br>"
-  else
-    SUMMARY+="❌ $TESTNAME ($PASSED/$TOTAL_TESTS)<br>"
-  fi
+# Limpiar archivo de summary
+> reports/test_summary.html
+
+# Ejecutar cada test individualmente y generar el resumen
+for classfile in testbin/*.class; do
+    classname=$(basename "$classfile" .class)
+    
+    # Ejecutar la clase de test
+    output=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" org.junit.runner.JUnitCore "$classname" 2>&1)
+
+    # Contar total de tests y fallos
+    total=$(echo "$output" | grep -oP 'Tests run: \K\d+')
+    failures=$(echo "$output" | grep -oP 'Failures: \K\d+')
+    passed=$((total - failures))
+
+    # Marcar ✅ o ❌ según resultados
+    if [ "$failures" -eq 0 ]; then
+        echo "✅ $classname ($passed/$total)" >> reports/test_summary.html
+    else
+        echo "❌ $classname ($passed/$total)" >> reports/test_summary.html
+    fi
 done
 
-# Guardar summary en archivo
-mkdir -p reports
-echo "$SUMMARY" > reports/test_summary.html
-echo "✅ Resumen de tests generado:"
-cat reports/test_summary.html
+echo "✅ Summary generado en reports/test_summary.html"

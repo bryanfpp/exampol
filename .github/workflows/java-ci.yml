@@ -24,16 +24,14 @@ jobs:
         run: |
           mkdir -p bin
           javac -d bin src/*.java
-          echo "✅ Código compilado"
 
       - name: Compilar tests
         run: |
           mkdir -p testbin
           if ls tests/*.java >/dev/null 2>&1; then
             javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:bin" -d testbin tests/*.java
-            echo "✅ Tests compilados"
           else
-            echo "⚠️ No se encontraron tests en tests/*.java"
+            echo "⚠️ No se encontraron tests"
           fi
 
       - name: Ejecutar tests y generar salida
@@ -42,32 +40,20 @@ jobs:
           java -jar lib/junit-platform-console-standalone-1.9.3.jar \
           --class-path "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" \
           --scan-class-path > test_output.txt || true
-          echo "✅ Tests ejecutados"
 
-      - name: Determinar resultado del test
-        id: teststatus
-        run: |
-          if grep -q "FAILURE" test_output.txt || grep -q "failed" test_output.txt; then
-            echo "status=failed" >> $GITHUB_OUTPUT
-          else
-            echo "status=success" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generar reporte HTML
+      - name: Preparar reporte HTML
         run: |
           cp template_reporte.html index.html
 
-          STATUS="${{ steps.teststatus.outputs.status }}"
           AUTHOR="$(git log -1 --pretty=format:'%an')"
-          TIMESTAMP="$(git log -1 --pretty=format:'%ad')"
-          COMMIT_MESSAGE="$(git log -1 --pretty=format:'%s')"
-          COMMIT_COUNT=$(git rev-list --count HEAD)
+          EMAIL="$(git log -1 --pretty=format:'%ae')"
+          DATE="$(git log -1 --pretty=format:'%ad')"
+          MESSAGE="$(git log -1 --pretty=format:'%s')"
 
-          sed -i "s/{{STATUS}}/$STATUS/" index.html
           sed -i "s/{{AUTHOR}}/$AUTHOR/" index.html
-          sed -i "s/{{TIMESTAMP}}/$TIMESTAMP/" index.html
-          sed -i "s/{{COMMIT_MESSAGE}}/$COMMIT_MESSAGE/" index.html
-          sed -i "s/{{COMMIT_COUNT}}/$COMMIT_COUNT/" index.html
+          sed -i "s/{{EMAIL}}/$EMAIL/" index.html
+          sed -i "s/{{DATE}}/$DATE/" index.html
+          sed -i "s/{{MESSAGE}}/$MESSAGE/" index.html
 
           OUTPUT=$(sed 's/"/\\"/g' test_output.txt | sed ':a;N;$!ba;s/\n/<br>/g')
           sed -i "s|{{TEST_OUTPUT}}|$OUTPUT|" index.html

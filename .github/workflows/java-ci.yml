@@ -128,20 +128,23 @@ jobs:
           PASSED="${{ steps.run_tests.outputs.tests_passed }}"
           TOTAL="${{ steps.run_tests.outputs.tests_total }}"
 
-          # Quitar códigos de color ANSI del log
+          # Limpiar códigos ANSI
           CLEAN_OUTPUT=$(sed 's/\x1B\[[0-9;]*[A-Za-z]//g' test_output.txt)
 
-          # Cambiar saltos de línea por <br>
+          # Reemplazar saltos de línea
           OUTPUT=$(printf "%s" "$CLEAN_OUTPUT" | sed ':a;N;$!ba;s/\n/<br>/g')
 
-          perl -pi -e "s/\{\{STATUS\}\}/$STATUS/g" index.html
-          perl -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" index.html
-          perl -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" index.html
-          perl -pi -e "s/\{\{DATE\}\}/$DATE/g" index.html
-          perl -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" index.html
-          perl -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" index.html
-          perl -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" index.html
-          perl -pi -e "s/\{\{TEST_OUTPUT\}\}/$OUTPUT/g" index.html
+          # Escapar caracteres para que no rompan perl
+          SAFE_OUTPUT=$(printf "%s" "$OUTPUT" | sed 's/[&/]/\\&/g')
+
+          perl -CS -pi -e "s/\{\{STATUS\}\}/$STATUS/g" index.html
+          perl -CS -pi -e "s/\{\{AUTHOR\}\}/$AUTHOR/g" index.html
+          perl -CS -pi -e "s/\{\{EMAIL\}\}/$EMAIL/g" index.html
+          perl -CS -pi -e "s/\{\{DATE\}\}/$DATE/g" index.html
+          perl -CS -pi -e "s/\{\{MESSAGE\}\}/$MESSAGE/g" index.html
+          perl -CS -pi -e "s/\{\{TESTS_PASSED\}\}/$PASSED/g" index.html
+          perl -CS -pi -e "s/\{\{TESTS_TOTAL\}\}/$TOTAL/g" index.html
+          perl -CS -pi -e "s/\{\{TEST_OUTPUT\}\}/$SAFE_OUTPUT/g" index.html
 
 
       - name: Deploy a Cloudflare Pages

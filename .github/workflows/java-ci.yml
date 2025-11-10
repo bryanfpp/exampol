@@ -80,8 +80,8 @@ jobs:
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
 
+          # Generar resumen vertical de clases
           SUMMARY=$(awk '
-          # Detecta clases de test reales (ignorando JUnit Jupiter, Vintage, etc.)
           /^[[:space:]]*│[[:space:]]*├─ [A-Za-z0-9_]+ ✔|✘/ {
               gsub(/^[[:space:]]*│[[:space:]]*├─ | ✔|✘/, "", $0);
               current_class=$0
@@ -89,14 +89,10 @@ jobs:
               total=0
               next
           }
-
-          # Cuenta tests dentro de la clase
           /^[[:space:]]*│[[:space:]]*│[[:space:]]*├─ [a-zA-Z0-9_]+\(\)/ {
               total++
               if ($0 ~ /✔/) passed++
           }
-
-          # Al encontrar otra clase o final, imprime la clase anterior
           /^[[:space:]]*│[[:space:]]*├─ [A-Za-z0-9_]+ ✔|✘|^$/ {
               if (current_class != "" && total>0) {
                   status = (passed==total) ? "✅" : "❌"
@@ -104,15 +100,16 @@ jobs:
                   current_class=""
               }
           }
-
           END {
-              # Imprime la última clase
               if (current_class != "" && total>0) {
                   status = (passed==total) ? "✅" : "❌"
                   print status " " current_class " (" passed "/" total ")"
               }
           }
           ' test_output.txt)
+
+          # Exportar el resumen para HTML
+          echo "test_class_summary=$SUMMARY" >> $GITHUB_OUTPUT
 
           set -e
 

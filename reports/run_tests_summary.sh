@@ -3,7 +3,7 @@ set -e
 echo "🧪 Ejecutando tests y generando summary..."
 
 # Crear carpetas si no existen
-mkdir -p bin testbin reports
+mkdir -p bin testbin reports/junit
 
 # Compilar src/*.java
 echo "Compilando src/*.java..."
@@ -23,34 +23,30 @@ fi
 SUMMARY_FILE="reports/test_summary.html"
 echo "" > "$SUMMARY_FILE"
 
-# Ejecutar todos los tests usando scan-class-path
-OUTPUT=$(java -cp "bin:testbin:lib/junit-platform-console-standalone-1.9.3.jar" \
-    org.junit.platform.console.ConsoleLauncher \
-    --class-path "testbin" \
+# Ejecutar todos los tests y generar XML
+java -jar lib/junit-platform-console-standalone-1.9.3.jar \
+    --class-path "bin:testbin" \
     --scan-class-path \
-    --details=summary \
-    2>&1 || true)
+    --reports-dir reports/junit \
+    --fail-if-no-tests false \
+    2>&1 | tee reports/test_output.txt
 
-# Extraer resultados por clase
-# Cada línea de salida de summary de JUnit 5 tiene formato:
-# TestConversorMoneda ✔
-# TestEcuacionTrio ✘
-echo "$OUTPUT" | grep -E '^[^ ]+ [✔✘]' | while read -r line; do
-    CLASS_NAME=$(echo "$line" | awk '{print $1}')
-    STATUS=$(echo "$line" | awk '{print $2}')
-
-    # Contar tests totales, fallidos y pasados
-    CLASS_OUTPUT=$(echo "$OUTPUT" | awk "/$CLASS_NAME/,/^$/")
-    TOTAL=$(echo "$CLASS_OUTPUT" | grep -c '()')
-    FAILED=$(echo "$CLASS_OUTPUT" | grep -c '✘')
+# Parsear cada XML para generar resumen por clase
+for XMLFILE in reports/junit/*.xml; do
+    CLASS_NAME=$(basename "$XMLFILE" .xml)
+    
+    # Extraer totales y fallidos del XML
+    TOTAL=$(grep -oP 'tests="\K\d+' "$XMLFILE" | head -1)
+    FAILED=$(grep -oP 'failures="\K\d+' "$XMLFILE" | head -1)
     PASSED=$((TOTAL - FAILED))
 
-    if [ "$STATUS" = "✔" ]; then
+    if [ "$FAILED" -eq 0 ]; then
         STATUS_EMOJI="✅"
     else
         STATUS_EMOJI="❌"
     fi
 
+    # Escribir línea en test_summary.html
     echo "${STATUS_EMOJI} ${CLASS_NAME} (${PASSED}/${TOTAL})<br>" >> "$SUMMARY_FILE"
 done
 

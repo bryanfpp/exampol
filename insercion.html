@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ej 4.11 - Inserción Directa</title>
+    <title>Ejercicio 4.11 - Inserción Directa</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
         .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
@@ -27,7 +27,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Ej 4.11 - Inserción Directa</h1>
+            <h1>Ejercicio 4.11 - Inserción Directa</h1>
             <p>Ordena un arreglo de enteros usando el método de Inserción Directa.</p>
         </header>
 
@@ -43,35 +43,26 @@
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>La clase principal debe llamarse <code>InsercionDirecta.java</code>.</li>
-                    <li>El método <code>ordenar(int[] uni)</code> debe ser <code>void</code>, ya que modifica el arreglo original (ordena "in-place").</li>
-                    <li>El <strong>bucle exterior</strong> (<code>for i...</code>) empieza en 1 (<code>i = 1</code>), no en 0.</li>
-                    <li>Guarda el valor a insertar: <code>int auxiliar = uni[i];</code></li>
-                    <li>El <strong>bucle interior</strong> (<code>while j...</code>) se mueve "hacia atrás" (<code>j--</code>) para desplazar los elementos mayores que <code>auxiliar</code>.</li>
-                    <li>Condición del <code>while</code>: <code>while (j >= 0 && uni[j] > auxiliar)</code></li>
-                    <li>Desplazamiento: <code>uni[j + 1] = uni[j];</code></li>
-                    <li>Inserción final: <code>uni[j + 1] = auxiliar;</code></li>
-                    <li>Para las pruebas, usa <code>assertArrayEquals(esperado, uni);</code>.</li>
+                    <li>Recorre el arreglo desde la posición 1 hasta el final.</li>
+                    <li>Guarda el elemento actual en una variable temporal: <code>int aux = UNI[i];</code></li>
+                    <li>Mueve los elementos mayores que <code>aux</code> una posición hacia la derecha.</li>
+                    <li>El índice <code>j</code> debe retroceder con <code>j--</code> mientras se cumpla la condición del while.</li>
+                    <li>Condición del ciclo interno:
+                        <br><code>while (j >= 0 && UNI[j] > aux)</code>
+                    </li>
+                    <li>Después del desplazamiento, coloca el valor:
+                        <br><code>UNI[j + 1] = aux;</code>
+                    </li>
+                    <li>El algoritmo ordena el arreglo directamente (no crea uno nuevo).</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="../diagramas/ej4_11.png" alt="Diagrama de flujo para Ej 4.11" 
-                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                    <img src="/img/inserciondirecta.png" alt="Diagrama de flujo para Ej 4.11" 
+                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>'; ">
                 </div>
-            </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>
-                    Presiona el botón para ver el reporte de pruebas de este ejercicio,
-                    generado automáticamente por GitHub Actions.
-                </p>
-                <a href="../insercion_results.html" class="btn-probar" target="_blank">
-                    Ver Reporte de Pruebas
-                </a>
             </div>
 
             <a href="../index.html" class="back-link">← Volver al Inicio</a>

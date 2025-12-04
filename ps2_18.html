@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PS 2.18 - Costo Llamada Telefónica</title>
+    <title>PS 2.18 - Costo de una Llamada Telefónica</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
         .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
@@ -33,7 +33,7 @@
             background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
             padding: 20px; border-radius: 8px; margin-top: 20px;
             white-space: pre-wrap; word-wrap: break-word;
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         .terminal.visible { display: block; }
         .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
@@ -45,8 +45,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>PS 2.18 - Costo Llamada Telefónica</h1>
-            <p>Calcula el costo final de una llamada basado en la zona y duración.</p>
+            <h1>PS 2.18 - Costo de una Llamada Telefónica</h1>
+            <p>Cálculo del costo total según la zona y la duración de la llamada.</p>
         </header>
 
         <main>
@@ -54,72 +54,37 @@
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Calcular e imprimir el costo final de una llamada telefónica. El costo depende de la clave de la zona y tiene un precio para los primeros 3 minutos y otro para los minutos adicionales.
+                    Se desea calcular e imprimir el costo total de una llamada telefónica. El usuario proporciona la clave de la zona a la que se llama y el número de minutos hablados. 
+                    Cada zona tiene un costo por minuto para los primeros 3 minutos, y un costo diferente para los minutos adicionales. 
                 </p>
-                <p><strong>Datos:</strong> <code>CLAVE</code> (entero), <code>NUMIN</code> (entero, número de minutos).</p>
+                <p>
+                    Este programa debe identificar la tarifa correspondiente a la zona, calcular correctamente el costo base y el costo extra si aplica, y validar que los minutos no sean negativos.
+                </p>
+                <p><strong>Datos:</strong> <code>CLAVE</code> (entero), <code>NUMIN</code> (entero).</p>
             </div>
 
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
                     <li>La clase principal debe llamarse <code>CostoLlamada.java</code>.</li>
-                    <li>Este problema requiere una estructura <code>if-else-if</code> (o un <code>switch</code>) para seleccionar la tarifa basada en la <code>CLAVE</code>.</li>
-                    <li><strong>Nota:</strong> Las claves 25 (Asia) y 25 (África) están duplicadas. Es mejor usar <code>if-else-if</code>.</li>
-                    <li>Dentro de cada tarifa, necesitarás otro <code>if-else</code> para determinar el costo:</li>
-                    <li><code>if (NUMIN <= 3) { COSTO = NUMIN * PRECIO_BASE; }</code></li>
-                    <li><code>else { COSTO = (3 * PRECIO_BASE) + ((NUMIN - 3) * PRECIO_EXTRA); }</code></li>
-                    <li>Es buena idea crear un método auxiliar privado para calcular el costo y evitar repetir código.</li>
+                    <li>Usa un <code>switch</code> o una estructura <code>if-else-if</code> para identificar la tarifa según la clave ingresada.</li>
+                    <li>Cada clave tiene dos costos: un precio para los primeros 3 minutos y otro para los minutos adicionales.</li>
+                    <li>Validar que los minutos (<code>NUMIN</code>) sean mayores o iguales que cero.</li>
+                    <li>Fórmula si la llamada dura 3 minutos o menos:</li>
+                    <li><code>COSTO = NUMIN * PRECIO_BASE</code></li>
+                    <li>Fórmula si la llamada dura más de 3 minutos:</li>
+                    <li><code>COSTO = (3 * PRECIO_BASE) + ((NUMIN - 3) * PRECIO_EXTRA)</code></li>
+                    <li>Es recomendable encapsular el cálculo en un método auxiliar para evitar repetir código.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/ps2_18.png" alt="Diagrama de flujo para PS 2.18" 
+                    <img src="/img/costollamada.png" alt="Diagrama de flujo para PS 2.18" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestCostoLlamada</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestCostoLlamada</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Jupiter [OK]
-| '-- TestCostoLlamada [OK]
-|   +-- testClaveInvalida() [OK]
-|   +-- testClave12_TramoBase() [OK]
-|   +-- testClave19_TramoExtra() [OK]
-|   +-- testClave18_TramoExtra() [OK]
-|   +-- testMinutosNegativos() [OK]
-|   +-- testClave29_TramoExtra() [OK]
-|   +-- testClave25_TramoBase() [OK]
-|   '-- testClave15_TramoBase() [OK]
-'-- JUnit Platform Suite [OK]
-
-Test run finished after 97 ms
-[         3 containers found      ]
-[         0 containers skipped    ]
-[         3 containers started    ]
-[         0 containers aborted    ]
-[         3 containers successful ]
-[         0 containers failed     ]
-[         8 tests found           ]
-[         0 tests skipped         ]
-[         8 tests started         ]
-[         0 tests aborted         ]
-[         8 tests successful      ]
-[         0 tests failed          ]
-</pre>
-            </div>
-
             <a href="index.html" class="back-link">← Volver al Inicio</a>
         </main>
     </div>

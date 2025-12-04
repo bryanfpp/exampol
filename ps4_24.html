@@ -33,7 +33,7 @@
             background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
             padding: 20px; border-radius: 8px; margin-top: 20px;
             white-space: pre-wrap; word-wrap: break-word;
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         .terminal.visible { display: block; }
         .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
@@ -54,16 +54,19 @@
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Se tiene una tabla (matriz) con las calificaciones de N alumnos en 5 exámenes.
+                    Se cuenta con una tabla de calificaciones donde cada fila representa a un alumno y cada columna corresponde a uno de los 5 exámenes aplicados. 
+                    El objetivo del programa es analizar esta información para obtener diferentes resultados estadísticos que permitan entender el rendimiento general y particular de los estudiantes.
                 </p>
-                <p><strong>Dato:</strong> <code>ALUM[N][5]</code> (arreglo bidimensional de tipo real).</p>
-                <p>Se debe calcular:</p>
+                <p>
+                    A partir de la matriz <code>ALUM[N][5]</code> (arreglo bidimensional de valores reales), se deben realizar cálculos que involucren promedios, búsqueda de mejores calificaciones y comparación de notas entre exámenes.
+                </p>
+                <p>El programa debe determinar:</p>
                 <ul>
-                    <li>a) El promedio de calificaciones de cada uno de los N alumnos.</li>
-                    <li>b) El/los alumnos que obtuvieron la mejor calificación en el tercer examen.</li>
-                    <li>c) El/los alumnos que obtuvieron la mayor calificación en el primero y en el quinto examen.</li>
-                    <li>d) Dado un alumno, informar en qué examen logró la menor calificación.</li>
-                    <li>e) ¿En qué examen fue más alto el promedio de los N alumnos?</li>
+                    <li>a) El promedio de calificaciones de cada uno de los alumnos.</li>
+                    <li>b) El o los alumnos con la mejor calificación en el tercer examen.</li>
+                    <li>c) El o los alumnos con la mayor calificación en el primer y en el quinto examen.</li>
+                    <li>d) Para un alumno específico, indicar en cuál examen obtuvo su menor calificación.</li>
+                    <li>e) Determinar cuál de los cinco exámenes tuvo el promedio más alto entre todos los alumnos.</li>
                 </ul>
             </div>
 
@@ -71,60 +74,29 @@
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
                     <li>La clase principal debe llamarse <code>AnalizadorCalificaciones.java</code>.</li>
-                    <li>El constructor de la clase debe recibir la matriz <code>double[][] alum</code>.</li>
-                    <li>La matriz se recorre como <code>ALUM[i][j]</code>, donde <code>i</code> es el alumno y <code>j</code> es el examen.</li>
-                    <li>Recuerda que los índices de Java son 0-based: Alumno 1 es el índice 0. Examen 3 es el índice 2.</li>
-                    <li><b>(a) Promedio por alumno:</b> Recorre por filas. Suma las 5 columnas de una fila <code>i</code> y divide entre 5.</li>
-                    <li><b>(b) Mejor del Examen 3:</b> Recorre por columnas. Primero, recorre la columna 2 (<code>j=2</code>) para encontrar el <code>max</code>. Luego, vuelve a recorrerla para encontrar a todos los alumnos <code>i</code> que igualen ese <code>max</code>.</li>
-                    <li><b>(e) Mejor promedio de examen:</b> Recorre por columnas. Calcula la suma de cada columna <code>j</code>, divídela entre N (<code>numAlumnos</code>) y encuentra el promedio más alto.</li>
+                    <li>El constructor debe recibir la matriz <code>double[][] alum</code>, donde <code>i</code> es el índice del alumno y <code>j</code> es el índice del examen.</li>
+                    <li>Recuerda que Java usa índices desde 0: Examen 1 es <code>j=0</code>, Examen 5 es <code>j=4</code>.</li>
+
+                    <li><b>(a) Promedio por alumno:</b> Recorre cada fila. Suma las 5 calificaciones del alumno <code>i</code> y divide entre 5.</li>
+
+                    <li><b>(b) Mejor en Examen 3:</b> Busca el valor máximo en la columna <code>j=2</code>. Luego identifica todos los alumnos cuyo valor sea igual al máximo.</li>
+
+                    <li><b>(c) Mejores en Examen 1 y 5:</b> Repite el mismo proceso de búsqueda de máximo para las columnas <code>j=0</code> y <code>j=4</code>.</li>
+
+                    <li><b>(d) Peor examen de un alumno:</b> Para el alumno dado, recorre sus cinco calificaciones, encuentra la menor y devuelve el índice del examen.</li>
+
+                    <li><b>(e) Examen con mejor promedio:</b> Recorre cada columna, suma sus valores, divide entre <code>N</code> y determina cuál promedio es el mayor.</li>
                 </ul>
             </div>
 
-            <div class="card">
-                <h2>📊 Diagrama de Flujo (Inciso E)</h2>
+             <div class="card">
+                <h2>📊 Diagrama de Flujo (Inciso A)</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/ps4_24.png" alt="Diagrama de flujo para PS 4.24 - Inciso E" 
-                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                    <img src="/img/calificacionalumnos4.24.png" alt="Diagrama de flujo para PS 3.36 - Inciso A" 
+                         onerror="this.parentElement.innerHTML ='<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                </div>
                 </div>
             </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestAnalizadorCalificaciones</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestAnalizadorCalificaciones</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Jupiter [OK]
-| '-- TestAnalizadorCalificaciones [OK]
-|   +-- testIncisoD_PeorExamenAlumno() [OK]
-|   +-- testIncisoB_MejoresExamen3() [OK]
-|   +-- testIncisoE_ExamenMejorPromedio() [OK]
-|   +-- testIncisoA_PromediosAlumnos() [OK]
-|   '-- testIncisoC_MejoresExamen1y5() [OK]
-'-- JUnit Platform Suite [OK]
-
-Test run finished after 101 ms
-[         3 containers found      ]
-[         0 containers skipped    ]
-[         3 containers started    ]
-[         0 containers aborted    ]
-[         3 containers successful ]
-[         0 containers failed     ]
-[         5 tests found           ]
-[         0 tests skipped         ]
-[         5 tests started         ]
-[         0 tests aborted         ]
-[         5 tests successful      ]
-[         0 tests failed          ]
-</pre>
-            </div>
-
             <a href="index.html" class="back-link">← Volver al Inicio</a>
         </main>
     </div>

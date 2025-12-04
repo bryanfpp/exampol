@@ -33,7 +33,7 @@
             background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
             padding: 20px; border-radius: 8px; margin-top: 20px;
             white-space: pre-wrap; word-wrap: break-word;
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         .terminal.visible { display: block; }
         .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
@@ -54,7 +54,10 @@
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Construir un programa que calcule el perímetro y la superficie de un rectángulo.
+                    Elaborar un programa que, a partir de los valores proporcionados de <strong>BASE</strong> y <strong>ALTURA</strong>, determine tanto el <strong>área</strong> como el <strong>perímetro</strong> de un rectángulo. El área representa la medida de la superficie interna, mientras que el perímetro corresponde a la suma de todos sus lados.
+                </p>
+                <p>
+                    El usuario debe ingresar los dos valores y el programa realizará los cálculos correspondientes utilizando las fórmulas geométricas básicas.
                 </p>
                 <p><strong>Datos:</strong> <code>BASE</code>, <code>ALTU</code> (variables de tipo real).</p>
             </div>
@@ -62,56 +65,23 @@
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>La clase principal debe llamarse <code>Rectangle.java</code>.</li>
-                    <li>Fórmula de Superficie: <code>Superficie = BASE * ALTU</code></li>
-                    <li>Fórmula de Perímetro: <code>Perímetro = 2 * (BASE + ALTU)</code></li>
-                    <li>Es buena práctica validar que <code>BASE</code> y <code>ALTU</code> no sean números negativos. Puedes usar un <code>IllegalArgumentException</code> en el constructor.</li>
-                    <li>La clase de prueba debe tener tests para valores enteros, decimales y casos límite (como 0 o negativos).</li>
+                    <li>El rectángulo se define por dos medidas principales: <strong>base</strong> y <strong>altura</strong>.</li>
+                    <li>Fórmula del área: <code>Área = BASE * ALTURA</code></li>
+                    <li>Fórmula del perímetro: <code>Perímetro = 2 * (BASE + ALTURA)</code></li>
+                    <li>Verifica que los valores ingresados sean mayores que cero para evitar resultados incorrectos.</li>
+                    <li>Recuerda que las unidades se mantienen: si la base está en cm y la altura en cm, el área quedará en cm².</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/rectangulo.png" alt="Diagrama de flujo para Rectángulo" 
+                    <img src="img/rectangulo.png" alt="Diagrama de flujo para Rectángulo" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
 
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestRectangle</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestRectangle</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Vintage [OK]
-| '-- TestRectangle [OK]
-|   +-- testValoresDecimales() [OK]
-|   +-- testPerimetro() [OK]
-|   '-- testSuperficie() [OK]
-'-- JUnit Platform Suite [OK]
-
-Test run finished after 82 ms
-[         3 containers found      ]
-[         0 containers skipped    ]
-[         3 containers started    ]
-[         0 containers aborted    ]
-[         3 containers successful ]
-[         0 containers failed     ]
-[         3 tests found           ]
-[         0 tests skipped         ]
-[         3 tests started         ]
-[         0 tests aborted         ]
-[         3 tests successful      ]
-[         0 tests failed          ]
-</pre>
-            </div>
+            
 
             <a href="index.html" class="back-link">← Volver al Inicio</a>
         </main>

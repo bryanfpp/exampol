@@ -46,7 +46,7 @@
     <div class="container">
         <header>
             <h1>PS 5.3 - Inmobiliaria</h1>
-            <p>Gestiona y filtra una lista de departamentos en renta.</p>
+            <p>Gestiona, analiza y filtra departamentos en renta según condiciones específicas.</p>
         </header>
 
         <main>
@@ -54,72 +54,50 @@
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Una inmobiliaria tiene información sobre departamentos en renta. De cada uno se conoce: CLAVE, EXTENSION (m²), UBICACION (excelente, buena, regular, mala), PRECIO y DISPONIBLE (booleano).
+                    Una inmobiliaria administra un catálogo de departamentos disponibles o ya rentados. 
+                    De cada departamento se conoce lo siguiente:
                 </p>
-                <p>Se debe poder realizar las siguientes operaciones:</p>
+
                 <ul>
-                    <li>a) Listar departamentos <strong>disponibles</strong> con un <strong>precio &lt;= R</strong>.</li>
-                    <li>b) Listar departamentos <strong>disponibles</strong> con una <strong>extensión >= E</strong> Y <strong>ubicación "excelente"</strong>.</li>
-                    <li>c) Listar el monto de la renta de todos los departamentos <strong>alquilados</strong> (no disponibles).</li>
+                    <li><b>CLAVE:</b> identificador único del departamento.</li>
+                    <li><b>EXTENSIÓN:</b> área en metros cuadrados.</li>
+                    <li><b>UBICACIÓN:</b> nivel de ubicación (<i>excelente, buena, regular, mala</i>).</li>
+                    <li><b>PRECIO:</b> el costo de la renta.</li>
+                    <li><b>DISPONIBLE:</b> indica si puede ser rentado (true) o ya está ocupado (false).</li>
+                </ul>
+
+                <p>
+                    El programa debe analizar la lista de departamentos para responder diversas 
+                    consultas sobre disponibilidad, precio, ubicación y montos de renta.
+                </p>
+
+                <p>Las operaciones solicitadas son:</p>
+                <ul>
+                    <li><b>(a)</b> Mostrar los departamentos disponibles cuyo precio sea menor o igual a un valor R.</li>
+                    <li><b>(b)</b> Mostrar los departamentos disponibles cuya extensión sea mayor o igual a E y cuya ubicación sea “excelente”.</li>
+                    <li><b>(c)</b> Calcular y mostrar la suma de las rentas de todos los departamentos que ya se encuentran alquilados.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>Este problema se resuelve con <strong>Programación Orientada a Objetos (POO)</strong>.</li>
-                    <li>Crea una clase <code>Departamento.java</code> para guardar los 5 atributos (CLAVE, EXTENSION, etc.).</li>
-                    <li>Crea una clase <code>Inmobiliaria.java</code> que en su constructor reciba una <code>List&lt;Departamento&gt;</code>.</li>
-                    <li><b>Inciso (a):</b> Crea un método <code>incisoA(double r_precioMax)</code> que recorra la lista y devuelva una nueva lista filtrada. La condición es: <code>depto.isDisponible() && depto.getPrecio() <= r_precioMax</code>.</li>
-                    <li><b>Inciso (b):</b> Crea un método <code>incisoB(double e_extensionMin)</code>. La condición es: <code>depto.isDisponible() && depto.getExtension() >= e_extensionMin && depto.getUbicacion().equals("excelente")</code>.</li>
-                    <li><b>Inciso (c):</b> Crea un método <code>incisoC_SumaTotalAlquilados()</code> que sume el precio de los deptos donde <code>!depto.isDisponible()</code>.</li>
+                    <li>Crea una clase <code>Departamento</code> con los 5 atributos del problema y sus getters.</li>
+                    <li>Crea una clase <code>Inmobiliaria</code> que reciba la lista de departamentos en su constructor.</li>
+                    <li><b>(a) Filtrado por precio:</b> Recorrer todos los departamentos y conservar solo los que cumplan <code>disponible == true</code> y <code>precio <= R</code>.</li>
+                    <li><b>(b) Filtrado por extensión y ubicación:</b> La condición debe evaluar: disponible, extensión mínima y ubicación igual a "excelente".</li>
+                    <li><b>(c) Suma total:</b> Acumular el precio únicamente cuando <code>disponible == false</code>.</li>
+                    <li>Para devolver resultados, utiliza listas nuevas sin modificar la lista original.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>📊 Diagrama de Flujo (Inciso A)</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/ps5_3.png" alt="Diagrama de flujo para PS 5.3 - Inciso A" 
+                    <img src="/img/inmobilaria.png" alt="Diagrama de flujo para PS 5.3 - Inciso A" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestInmobiliaria</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestInmobiliaria</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Jupiter [OK]
-| '-- TestInmobiliaria [OK]
-|   +-- testIncisoA_PrecioMax() [OK]
-|   +-- testIncisoA_SinResultados() [OK]
-|   +-- testIncisoB_ExtensionYUbicacion() [OK]
-|   '-- testIncisoC_SumaTotalAlquilados() [OK]
-'-- JUnit Platform Suite [OK]
-
-Test run finished after 115 ms
-[         3 containers found      ]
-[         0 containers skipped    ]
-[         3 containers started    ]
-[         0 containers aborted    ]
-[         3 containers successful ]
-[         0 containers failed     ]
-[         4 tests found           ]
-[         0 tests skipped         ]
-[         4 tests started         ]
-[         0 tests aborted         ]
-[         4 tests successful      ]
-[         0 tests failed          ]
-</pre>
-            </div>
-
             <a href="index.html" class="back-link">← Volver al Inicio</a>
         </main>
     </div>

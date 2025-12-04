@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PS 3.35 - Ecuación (X, Y, Z)</title>
+    <title>PS 3.35 - Tríos (X, Y, Z) que cumplen la ecuación</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
         .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
@@ -33,7 +33,7 @@
             background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
             padding: 20px; border-radius: 8px; margin-top: 20px;
             white-space: pre-wrap; word-wrap: break-word;
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         .terminal.visible { display: block; }
         .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
@@ -45,8 +45,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>PS 3.35 - Ecuación (X, Y, Z)</h1>
-            <p>Imprime todos los tríos (X, Y, Z) que cumplan: 18X⁵ + 11Y⁵ + 8Z⁶ &lt; 6300</p>
+            <h1>PS 3.35 - Tríos (X, Y, Z) que cumplen la ecuación</h1>
+            <p>Imprime todos los tríos positivos (X, Y, Z) que cumplen: 18X⁵ + 11Y⁵ + 8Z⁶ &lt; 6300</p>
         </header>
 
         <main>
@@ -54,44 +54,53 @@
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Escriba un diagrama de flujo que imprima todos los valores de X, Y y Z que satisfacen la siguiente expresión: <code>18*X⁵ + 11*Y⁵ + 8*Z⁶ &lt; 6300</code>.
+                    Construya un diagrama de flujo que recorra valores enteros positivos para las variables <code>X</code>, <code>Y</code> y <code>Z</code> y muestre únicamente aquellos tríos que cumplen la condición:
                 </p>
-                <p><strong>Nota:</strong> X, Y y Z sólo pueden ser enteros positivos.</p>
+                <p>
+                    <strong><code>18X⁵ + 11Y⁵ + 8Z⁶ &lt; 6300</code></strong>
+                </p>
+                <p>
+                    El algoritmo debe evaluar todas las combinaciones permitidas y detener los ciclos cuando ya no existan valores posibles que puedan cumplir la desigualdad.
+                </p>
             </div>
 
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>La clase principal debe llamarse <code>EcuacionTrio.java</code>.</li>
-                    <li>Este problema requiere **tres bucles <code>while</code> anidados** (para X, Y, Z).</li>
-                    <li>Para las potencias, usa <code>Math.pow(base, exponente)</code>.</li>
-                    <li><b>Optimización:</b> Los bucles deben detenerse tan pronto como la condición (usando los valores mínimos para las variables internas) supere 6300.</li>
-                    <li>Ej: El bucle de <code>X</code> se detiene si <code>18*X⁵ + 11*(1)⁵ + 8*(1)⁶ >= 6300</code>.</li>
-                    <li>Para las pruebas, es útil que el método devuelva una <code>List&lt;Trio&gt;</code>, donde <code>Trio</code> es una clase auxiliar interna para guardar X, Y, Z.</li>
+                    <li>Utiliza tres ciclos <code>while</code> anidados: uno para X, dentro otro para Y, y finalmente otro para Z.</li>
+                    <li>Para calcular las potencias usa: <code>Math.pow(valor, exponente)</code>.</li>
+                    <li>
+                        <strong>Optimización:</strong> Detén cada ciclo cuando usando los valores mínimos de las variables internas la expresión ya no pueda ser menor que 6300.
+                    </li>
+                    <li>Ejemplo: el ciclo de <code>X</code> puede detenerse si  
+                        <code>18*X⁵ + 11*(1)⁵ + 8*(1)⁶ ≥ 6300</code>.
+                    </li>
+                    <li>El ciclo de <code>Y</code> se corta si  
+                        <code>18*X⁵ + 11*Y⁵ + 8*(1)⁶ ≥ 6300</code>.
+                    </li>
+                    <li>El de <code>Z</code> se detiene cuando  
+                        <code>18*X⁵ + 11*Y⁵ + 8Z⁶ ≥ 6300</code>.
+                    </li>
+                    <li>Recuerda imprimir únicamente los tríos que sí cumplen la desigualdad.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/ps3_35.png" alt="Diagrama de flujo para PS 3.35" 
+                    <img src="/img/tirosecuacion.png" alt="Diagrama de flujo para PS 3.35" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
+            <a href="index.html" class="back-link">← Volver al Inicio</a>
+        </main>
+    </div>
 
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestEcuacionTrio</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestEcuacionTrio</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Jupiter [OK]
-| '-- TestEcuacionTrio [OK]
-|   +-- testLimiteDe_Z() [OK]
-|   +-- testLimiteDe_X
+    <script>
+        function mostrarTerminal() {
+            const terminal = document.getElementById('terminal-output');
+            terminal.classList.toggle('visible');
+        }
+    </script>
+</body>
+</html>

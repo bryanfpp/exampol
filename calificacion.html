@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejercicio - Calificación</title>
+    <title>Ejercicio 1. Calificación de Alumno</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
         .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
@@ -45,8 +45,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>Calificación (Aprobado/Reprobado)</h1>
-            <p>Determina si un alumno aprueba o reprueba un examen.</p>
+            <h1>Ejercicio 1: Calificación de Alumno</h1>
+            <p>Determina si un alumno aprueba o reprueba un examen según su calificación.</p>
         </header>
 
         <main>
@@ -62,60 +62,21 @@
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>La clase principal debe llamarse <code>Calificacion.java</code>.</li>
-                    <li>Este problema requiere una estructura condicional <code>if-else</code>.</li>
-                    <li>La condición a evaluar es: <code>if (CAL >= 8)</code></li>
-                    <li>La clase de prueba (<code>TestCalificacion.java</code>) debe incluir casos límite (el 8 exacto, 7.9) y valores normales (9.5, 0).</li>
+                    <li>Usa una estructura condicional <code>if-else</code> para evaluar la calificación.</li>
+                    <li>Condición principal: <code>if (CAL >= 8)</code> → devuelve "Aprobado".</li>
+                    <li>En caso contrario, devuelve "Reprobado".</li>
+                    <li>Prueba con valores límite como 8, 7.9 y valores normales como 9.5 o 0.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/calificacion.png" alt="Diagrama de flujo para Calificación" 
+                    <img src="./img/calificacaionalumno.png" alt="Diagrama de flujo para Calificación" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestCalificacion</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestCalificacion</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Jupiter [OK]
-| '-- TestCalificacion [OK]
-|   +-- testReprobadoConCero() [OK]
-|   +-- testReprobadoConCalificacionInferior() [OK]
-|   +-- testAprobadoConCalificacionSuperior() [OK]
-|   '-- testAprobadoConOchoExacto() [OK]
-'-- JUnit Platform Suite [OK]
-
-Test run finished after 91 ms
-[         3 containers found      ]
-[         0 containers skipped    ]
-[         3 containers started    ]
-[         0 containers aborted    ]
-[         3 containers successful ]
-[         0 containers failed     ]
-[         4 tests found           ]
-[         0 tests skipped         ]
-[         4 tests started         ]
-[         0 tests aborted         ]
-[         4 tests successful      ]
-[         0 tests failed          ]
-</pre>
-            </div>
-
             <a href="index.html" class="back-link">← Volver al Inicio</a> 
-            <a href="template_reporte.html" class="back-link">REsultado</a>
-
         </main>
     </div>
 

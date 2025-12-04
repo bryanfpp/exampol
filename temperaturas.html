@@ -28,61 +28,52 @@
     <div class="container">
         <header>
             <h1>PS 4.19 - Temperaturas 3D</h1>
-            <p>Analiza un arreglo tridimensional [Estado][Mes][Año] de temperaturas.</p>
+            <p>Análisis de temperaturas almacenadas en un arreglo tridimensional.</p>
         </header>
 
         <main>
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    En el arreglo tridimensional <code>TEMP[32][12][50]</code> se almacenan promedios de temperaturas de los 32 estados, 12 meses, durante 50 años (1950-1999).
+                    Se cuenta con un arreglo tridimensional <code>TEMP[32][12][50]</code> que almacena las temperaturas promedio de los 32 estados de México, registradas durante los 12 meses del año, a lo largo de 50 años (de 1950 a 1999). Cada posición del arreglo representa la temperatura promedio de un estado específico en un mes y año determinados.
                 </p>
-                <p><strong>Dato:</strong> <code>TEMP[1..32, 1..12, 1950..1999]</code>.</p>
+                <p>
+                    El objetivo es analizar esta base de datos climática para obtener información relevante sobre tendencias y comportamientos de temperatura a través del tiempo.
+                </p>
+                <p><strong>Dato estructural:</strong> <code>TEMP[1..32, 1..12, 1950..1999]</code>.</p>
                 <p>Se debe calcular:</p>
                 <ul>
-                    <li>a) Estado con mayor temperatura promedio en los últimos 10 años (1990-1999).</li>
-                    <li>b) Estado con menor promedio anual en el último año (1999).</li>
-                    <li>c) Mes con mayor temperatura en el estado 29, en 1953.</li>
-                    <li>d) Mes y estado con la menor temperatura en 1975.</li>
+                    <li>a) El estado con mayor temperatura promedio considerando únicamente los últimos 10 años (1990–1999).</li>
+                    <li>b) El estado con el menor promedio anual durante el último año registrado (1999).</li>
+                    <li>c) El mes con la mayor temperatura en el estado 29, durante el año 1953.</li>
+                    <li>d) El mes y el estado con la menor temperatura registrada en todo el año 1975.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>La clase principal debe llamarse <code>AnalizadorTemperaturas.java</code>.</li>
-                    <li><strong>Manejo de Índices (Clave):</strong> Los arreglos en Java son 0-indexados.
+                    <li>Recuerda que los arreglos en Java son 0-indexados. Debes convertir los valores reales de estado, mes y año a sus índices correspondientes.</li>
+                    <li>Índices correctos:
                         <ul>
-                            <li>Estado 1-32 = Índice <code>e</code> 0-31 (<code>e = estado - 1</code>)</li>
-                            <li>Mes 1-12 = Índice <code>m</code> 0-11 (<code>m = mes - 1</code>)</li>
-                            <li>Año 1950-1999 = Índice <code>a</code> 0-49 (<code>a = año - 1950</code>)</li>
+                            <li>Estado 1–32 → índice <code>0–31</code>.</li>
+                            <li>Mes 1–12 → índice <code>0–11</code>.</li>
+                            <li>Año 1950–1999 → índice <code>0–49</code> usando <code>año - 1950</code>.</li>
                         </ul>
                     </li>
-                    <li>El constructor debe recibir el arreglo <code>double[][][] datos</code>.</li>
-                    <li>Crea un método para cada inciso (ej. <code>incisoA()</code>, <code>incisoB()</code>, etc.).</li>
-                    <li>Para (a) y (b), necesitarás bucles anidados para calcular promedios y compararlos.</li>
-                    <li>Para (d), puedes crear una clase auxiliar interna (<code>ResultadoMesEstado</code>) para devolver ambos valores.</li>
+                    <li>Para los cálculos de temperatura promedio utiliza acumuladores y contadores dentro de bucles anidados.</li>
+                    <li>En los incisos donde se compara información (como máximos o mínimos), inicializa tus variables con valores extremos adecuados.</li>
+                    <li>Para el inciso (d), deberás recorrer todos los estados y meses del año 1975 para encontrar el valor más bajo.</li>
                 </ul>
             </div>
-
             <div class="card">
-                <h2>📊 Diagrama de Flujo (Inciso A)</h2>
+                <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="../diagramas/ps4_19.png" alt="Diagrama de flujo para PS 4.19 - Inciso A" 
+                    <img src="./img/temperaturas.png" alt="Diagrama de flujo para Rectángulo" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>
-                    Presiona el botón para ver el reporte de pruebas de este ejercicio,
-                    generado automáticamente por GitHub Actions.
-                </p>
-                <a href="../temperaturas_results.html" class="btn-probar" target="_blank">
-                    Ver Reporte de Pruebas
-                </a>
-            </div>
+            
 
             <a href="../index.html" class="back-link">← Volver al Inicio</a>
         </main>

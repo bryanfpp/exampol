@@ -33,7 +33,7 @@
             background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
             padding: 20px; border-radius: 8px; margin-top: 20px;
             white-space: pre-wrap; word-wrap: break-word;
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         .terminal.visible { display: block; }
         .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
@@ -46,7 +46,7 @@
     <div class="container">
         <header>
             <h1>PS 4.8 - Búsqueda Secuencial Ordenada</h1>
-            <p>Búsqueda optimizada en un arreglo ordenado ascendentemente.</p>
+            <p>Búsqueda eficiente en un arreglo ordenado ascendentemente.</p>
         </header>
 
         <main>
@@ -54,78 +54,48 @@
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Realizar una búsqueda secuencial en un arreglo (VECTOR) que está ordenado. La búsqueda debe detenerse si el elemento actual (<code>V[I]</code>) es mayor que el elemento buscado (<code>X</code>), ya que esto indicaría que <code>X</code> no se encuentra en el arreglo.
+                    Se tiene un arreglo de números enteros (<code>VECTOR</code>) que ya está ordenado de forma ascendente. El objetivo es realizar una búsqueda secuencial para localizar un número específico <code>X</code>.
                 </p>
-                <p><strong>Datos:</strong> <code>VECTOR</code> (arreglo de enteros), <code>X</code> (entero a buscar).</p>
+                <p>
+                    Debido a que el arreglo está ordenado, la búsqueda puede detenerse antes de llegar al final: si en algún momento el valor actual del arreglo (<code>VECTOR[I]</code>) es mayor que el número buscado (<code>X</code>), entonces ya no es necesario seguir buscando, pues es imposible que <code>X</code> aparezca más adelante.
+                </p>
+                <p><strong>Datos:</strong> <code>VECTOR</code> (arreglo ordenado ascendentemente) y <code>X</code> (valor entero a buscar).</p>
+                <p>
+                    El algoritmo debe devolver la posición donde se encuentra <code>X</code>, o <code>-1</code> si no existe dentro del arreglo.
+                </p>
             </div>
 
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>La clase principal debe llamarse <code>BusquedaSecuencialOrdenada.java</code>.</li>
-                    <li>Este problema se resuelve con un solo bucle <code>while</code>.</li>
-                    <li>La condición del bucle es clave. Debe continuar mientras <strong>ambas</strong> cosas sean ciertas:
+                    <li>La clase debe llamarse <code>BusquedaSecuencialOrdenada.java</code>.</li>
+                    <li>Se utiliza un único bucle <code>while</code> para la búsqueda.</li>
+                    <li>El bucle continúa mientras:
                         <ol>
-                            <li>El índice <code>i</code> está dentro de los límites del arreglo (<code>i < vector.length</code>).</li>
-                            <li>El elemento actual es menor que el buscado (<code>vector[i] < x</code>).</li>
+                            <li><code>i &lt; vector.length</code> (para no salir del arreglo).</li>
+                            <li><code>vector[i] &lt; x</code> (mientras el valor actual sea menor al buscado).</li>
                         </ol>
                     </li>
-                    <li>Después de que el bucle se detiene, se debe hacer una verificación final:
+                    <li>Al terminar el bucle, verifica:
                         <ul>
-                            <li><code>if (i < vector.length && vector[i] == x)</code> -> Encontrado. Devolver <code>i</code>.</li>
-                            <li><code>else</code> -> No encontrado. Devolver <code>-1</code>.</li>
+                            <li><code>vector[i] == x</code> y el índice está dentro del arreglo → encontrado.</li>
+                            <li>Si no se cumplen las condiciones → no encontrado.</li>
                         </ul>
                     </li>
-                    <li>Los tests deben probar todos los casos: encontrado (inicio, medio, fin) y no encontrado (menor, en medio, mayor).</li>
+                    <li>Los casos a probar en tests incluyen:
+                        <ul>
+                            <li>Elemento encontrado al inicio, medio y final.</li>
+                            <li>Elemento no encontrado por ser menor, intermedio o mayor.</li>
+                        </ul>
+                    </li>
                 </ul>
-            </div>
-
-            <div class="card">
-                <h2>📊 Diagrama de Flujo</h2>
+                 <div class="card">
+                <h2>📊 Diagrama de Flujo (Inciso A)</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/ps4_8.png" alt="Diagrama de flujo para PS 4.8" 
-                         onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                    <img src="/img/busquedasecuancial.png" alt="Diagrama de flujo para PS 3.36 - Inciso A" 
+                         onerror="this.parentElement.innerHTML ='<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestBusquedaSecuencialOrdenada</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestBusquedaSecuencialOrdenada</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Jupiter [OK]
-| '-- TestBusquedaSecuencialOrdenada [OK]
-|   +-- testNoEncontrado_Intermedio() [OK]
-|   +-- testEncontradoAlInicio() [OK]
-|   +-- testNoEncontrado_MenorQueTodos() [OK]
-|   +-- testEncontradoAlFinal() [OK]
-|   +-- testNoEncontrado_MayorQueTodos() [OK]
-|   '-- testEncontradoEnMedio() [OK]
-'-- JUnit Platform Suite [OK]
-
-Test run finished after 95 ms
-[         3 containers found      ]
-[         0 containers skipped    ]
-[         3 containers started    ]
-[         0 containers aborted    ]
-[         3 containers successful ]
-[         0 containers failed     ]
-[         6 tests found           ]
-[         0 tests skipped         ]
-[         6 tests started         ]
-[         0 tests aborted         ]
-[         6 tests successful      ]
-[         0 tests failed          ]
-</pre>
-            </div>
-
             <a href="index.html" class="back-link">← Volver al Inicio</a>
         </main>
     </div>

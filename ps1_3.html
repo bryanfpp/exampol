@@ -33,7 +33,7 @@
             background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
             padding: 20px; border-radius: 8px; margin-top: 20px;
             white-space: pre-wrap; word-wrap: break-word;
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         .terminal.visible { display: block; }
         .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
@@ -54,7 +54,9 @@
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Dado como dato una cantidad expresada en dólares, convierta esa cantidad a pesos.
+                    Se desea convertir una cantidad expresada en dólares a su equivalente en pesos mexicanos.
+                    Para ello, el programa debe leer la cantidad ingresada por el usuario y multiplicarla
+                    por el tipo de cambio actual. El resultado final será el monto equivalente en pesos.
                 </p>
                 <p><strong>Dato:</strong> <code>CAN</code> (variable real que representa una cantidad en dólares).</p>
             </div>
@@ -62,58 +64,22 @@
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>La clase principal debe llamarse <code>ConversorMoneda.java</code>.</li>
-                    <li>La fórmula es: <code>PESOS = CAN * TIPO_CAMBIO</code></li>
-                    <li>Se debe usar el tipo de cambio: <code>1 dólar = 11.96 pesos</code></li>
-                    <li>Es buena práctica definir el tipo de cambio como una constante (<code>final double TIPO_CAMBIO = 11.96;</code>).</li>
-                    <li>Recuerda validar que la cantidad (<code>CAN</code>) no sea un número negativo.</li>
+                    <li>El cálculo principal consiste en multiplicar la cantidad en dólares por el tipo de cambio.</li>
+                    <li>Fórmula: <code>PESOS = CAN * TIPO_CAMBIO</code></li>
+                    <li>Usa el tipo de cambio establecido: <strong>1 dólar = 11.96 pesos</strong>.</li>
+                    <li>Para mayor claridad, define el tipo de cambio en una constante: <code>final double TIPO_CAMBIO = 11.96;</code></li>
+                    <li>Recuerda validar que la cantidad ingresada (<code>CAN</code>) sea mayor o igual a 0.</li>
+                    <li>El resultado debe imprimirse claramente como cantidad final en pesos.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/ps1_3.png" alt="Diagrama de flujo para PS 1.3" 
+                    <img src="/img/casadecambio.png" alt="Diagrama de flujo para PS 1.3" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestConversorMoneda</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestConversorMoneda</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Jupiter [OK]
-| '-- TestConversorMoneda [OK]
-|   +-- testConversionCero() [OK]
-|   +-- testManejoDeNegativos() [OK]
-|   +-- testConversionUno() [OK]
-|   '-- testConversionNormal() [OK]
-'-- JUnit Platform Suite [OK]
-
-Test run finished after 79 ms
-[         3 containers found      ]
-[         0 containers skipped    ]
-[         3 containers started    ]
-[         0 containers aborted    ]
-[         3 containers successful ]
-[         0 containers failed     ]
-[         4 tests found           ]
-[         0 tests skipped         ]
-[         4 tests started         ]
-[         0 tests aborted         ]
-[         4 tests successful      ]
-[         0 tests failed          ]
-</pre>
-            </div>
-
             <a href="index.html" class="back-link">← Volver al Inicio</a>
         </main>
     </div>

@@ -28,46 +28,43 @@
     <div class="container">
         <header>
             <h1>PS 3.3 - Cálculo de Serie</h1>
-            <p>Calcula el resultado de la serie: 1 + 1/2 + 1/3 + ... + 1/N</p>
+            <p>Calcula el resultado de la serie armónica hasta el término N.</p>
         </header>
 
         <main>
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Escriba un diagrama de flujo que lea un número entero N y calcule el resultado de la serie: 1 + 1/2 + 1/3 + ... + 1/N.
+                    Se requiere elaborar un programa que lea un número entero positivo <code>N</code> y calcule el valor total de la serie:
                 </p>
-                <p><strong>Dato:</strong> <code>N</code> (variable de tipo entero).</p>
+                <p style="text-align:center; font-weight:bold;">
+                    1 + 1/2 + 1/3 + ... + 1/N
+                </p>
+                <p>
+                    Esta serie se conoce como la <strong>serie armónica</strong>, y su resultado se obtiene sumando fracciones cuyos denominadores van desde 1 hasta N.
+                    El programa debe realizar la suma de cada término de manera acumulativa y mostrar el resultado final.
+                </p>
+                <p><strong>Dato de entrada:</strong> <code>N</code> (entero positivo mayor o igual a 1).</p>
             </div>
 
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
-                    <li>La clase principal debe llamarse <code>CalculadorSerie.java</code>.</li>
-                    <li>Necesitarás un bucle <code>for</code> que itere desde <code>i = 1</code> hasta <code>N</code>.</li>
-                    <li>Usa un acumulador de tipo <code>double</code> (ej. <code>double serie = 0.0;</code>).</li>
-                    <li>Dentro del bucle, la operación es: <code>serie = serie + (1.0 / i);</code></li>
-                    <li>Es crucial usar <code>1.0</code> para forzar una división decimal. Si usas <code>1 / i</code>, Java hará una división entera y el resultado (para i > 1) será siempre 0.</li>
+                    <li>Crea una clase llamada <code>CalculadorSerie.java</code>.</li>
+                    <li>Utiliza un bucle <code>for</code> para recorrer todos los valores desde <code>1</code> hasta <code>N</code>.</li>
+                    <li>Declara un acumulador de tipo <code>double</code> para sumar cada término de la serie.</li>
+                    <li>En cada iteración, suma el término correspondiente: <code>acumulador += 1.0 / i;</code></li>
+                    <li>Recuerda usar <code>1.0</code> para evitar división entera — esto garantiza que los resultados sean decimales.</li>
+                    <li>Valida que <code>N</code> sea mayor o igual a 1; si no lo es, el programa debe manejar el error adecuadamente.</li>
                 </ul>
             </div>
-
+            
             <div class="card">
                 <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="../diagramas/ps3_3.png" alt="Diagrama de flujo para PS 3.3" 
+                    <img src="./img/calcular serie.png" alt="Diagrama de flujo para Rectángulo" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
-            </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>
-                    Presiona el botón para ver el reporte de pruebas de este ejercicio,
-                    generado automáticamente por GitHub Actions.
-                </p>
-                <a href="../serie_results.html" class="btn-probar" target="_blank">
-                    Ver Reporte de Pruebas
-                </a>
             </div>
 
             <a href="../index.html" class="back-link">← Volver al Inicio</a>

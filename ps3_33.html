@@ -33,7 +33,7 @@
             background: #2d2d2d; color: #f1f1f1; font-family: 'Courier New', monospace;
             padding: 20px; border-radius: 8px; margin-top: 20px;
             white-space: pre-wrap; word-wrap: break-word;
-            display: none; /* Oculto por defecto */
+            display: none;
         }
         .terminal.visible { display: block; }
         .terminal-header { font-weight: bold; color: #82e882; margin-bottom: 10px; }
@@ -46,7 +46,7 @@
     <div class="container">
         <header>
             <h1>PS 3.33 - Máximo Común Divisor (MCD)</h1>
-            <p>Calcula el MCD de dos números naturales A y B.</p>
+            <p>Calcula el MCD de dos números naturales A y B utilizando el Algoritmo de Euclides.</p>
         </header>
 
         <main>
@@ -54,76 +54,48 @@
             <div class="card">
                 <h2>📝 Descripción del Problema</h2>
                 <p>
-                    Construya un diagrama de flujo que calcule el máximo común divisor (MCD) de dos números naturales A y B. El MCD es el natural más grande que divide a ambos.
+                    Construya un diagrama de flujo que calcule el Máximo Común Divisor (MCD) de dos números naturales A y B.
+                    El MCD es el número natural más grande que puede dividir exactamente a ambos números sin dejar residuo.
                 </p>
-                <p><strong>Datos:</strong> <code>A</code> y <code>B</code> (variables de tipo entero).</p>
+                <p>
+                    Para resolverlo, se deben leer ambos valores, aplicar un proceso iterativo que vaya reduciendo los valores mediante operaciones de residuo, 
+                    y determinar el valor final que representa el divisor común más grande.
+                </p>
+                <p><strong>Datos:</strong> <code>A</code> y <code>B</code> (enteros).</p>
             </div>
 
             <div class="card">
                 <h2>💡 Pistas y Fórmulas Clave</h2>
                 <ul>
                     <li>La clase principal debe llamarse <code>MCD.java</code>.</li>
-                    <li>La forma más eficiente de resolver esto es con el <strong>Algoritmo de Euclides</strong>, que usa un bucle <code>while</code>.</li>
-                    <li>La lógica del bucle es: <code>while (B != 0) { ... }</code></li>
-                    <li>Dentro del bucle, se usa el residuo (módulo <code>%</code>):
-                        <ol>
-                            <li><code>temp = B</code></li>
-                            <li><code>B = A % B</code></li>
-                            <li><code>A = temp</code></li>
-                        </ol>
+                    <li>El método recomendado para resolver este problema es el <strong>Algoritmo de Euclides</strong>.</li>
+                    <li>Dicho algoritmo usa un ciclo <code>while</code> que repite operaciones mientras <code>B</code> sea distinto de 0.</li>
+                    <li>La lógica del algoritmo es:</li>
+                    <ol>
+                        <li><code>temp = B</code></li>
+                        <li><code>B = A % B</code> &nbsp; (residuo de A entre B)</li>
+                        <li><code>A = temp</code></li>
+                    </ol>
+                    <li>El proceso continúa hasta que <code>B</code> llegue a 0.</li>
+                    <li>Cuando el bucle finaliza, el valor de <code>A</code> es el Máximo Común Divisor.</li>
+                    <li>El programa debe manejar casos como:
+                        <ul>
+                            <li>Uno de los números es 0.</li>
+                            <li>Números en orden invertido (A &lt; B).</li>
+                            <li>Números primos entre sí (MCD = 1).</li>
+                            <li>Un número es múltiplo exacto del otro.</li>
+                        </ul>
                     </li>
-                    <li>Cuando el bucle termina, <code>A</code> contiene el MCD.</li>
-                    <li>La prueba (<code>TestMCD.java</code>) debe incluir casos donde A > B, B > A, números primos entre sí, y el caso de A o B siendo 0.</li>
                 </ul>
             </div>
 
             <div class="card">
                 <h2>📊 Diagrama de Flujo</h2>
                 <div class="diagram-container">
-                    <img src="./diagramas/ps3_33.png" alt="Diagrama de flujo para PS 3.33" 
+                    <img src="/img/mcd.png" alt="Diagrama de flujo para PS 3.33" 
                          onerror="this.parentElement.innerHTML = '<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
                 </div>
             </div>
-
-            <div class="card">
-                <h2>▶️ Prueba y Resultados</h2>
-                <p>Resultado de ejecutar <code>--select-class TestMCD</code> en la terminal.</p>
-                
-                <button class="btn-probar" onclick="mostrarTerminal()">Mostrar Resultado de Pruebas</button>
-                
-                <pre id="terminal-output" class="terminal">
-<span class="terminal-header">PS C:\Users\...\Ejercicios> java -jar lib\junit-platform-console-standalone-1.9.3.jar -cp "src;tests" --select-class TestMCD</span>
-
-Thanks for using JUnit! Support its development at https://junit.org/sponsoring
-
-.
-+-- JUnit Jupiter [OK]
-| '-- TestMCD [OK]
-|   +-- testNumerosGrandes() [OK]
-|   +-- testAmbosCero() [OK]
-|   +-- testConCero() [OK]
-|   +-- testArgumentosInvertidos() [OK]
-|   +-- testNumerosPrimosEntreSi() [OK]
-|   +-- testUnNumeroEsMultiploDelOtro() [OK]
-|   '-- testNumerosNegativos() [OK]
-'-- JUnit Platform Suite [OK]
-
-Test run finished after 92 ms
-[         3 containers found      ]
-[         0 containers skipped    ]
-[         3 containers started    ]
-[         0 containers aborted    ]
-[         3 containers successful ]
-[         0 containers failed     ]
-[         7 tests found           ]
-[         0 tests skipped         ]
-[         7 tests started         ]
-[         0 tests aborted         ]
-[         7 tests successful      ]
-[         0 tests failed          ]
-</pre>
-            </div>
-
             <a href="index.html" class="back-link">← Volver al Inicio</a>
         </main>
     </div>

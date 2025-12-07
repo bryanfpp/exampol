@@ -40,6 +40,19 @@
         
         .back-link { display: inline-block; margin-top: 20px; color: #667eea; text-decoration: none; font-weight: 600; }
         .back-link:hover { text-decoration: underline; }
+        
+        .btn-toggle-diagram {
+            background-color: #667eea; color: white; border: none;
+            padding: 10px 20px; font-size: 0.95em; font-weight: 600;
+            border-radius: 6px; cursor: pointer; transition: all 0.3s;
+            margin-bottom: 15px; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-toggle-diagram:hover { background-color: #764ba2; }
+        .btn-toggle-diagram.collapsed::before { content: "▶"; }
+        .btn-toggle-diagram.expanded::before { content: "▼"; }
+        
+        .diagram-content { display: none; }
+        .diagram-content.visible { display: block; }
     </style>
 </head>
 <body>
@@ -91,12 +104,14 @@
                 </ul>
                  <div class="card">
                 <h2>📊 Diagrama de Flujo (Inciso A)</h2>
-                <div class="diagram-container">
-                    <img src="./img/busquedasecuancial.png" alt="Diagrama de flujo para PS 3.36 - Inciso A" 
-                         onerror="this.parentElement.innerHTML ='<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>';">
+                <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+                <div class="diagram-content">
+                    <div class="diagram-container">
+                        <img src="./img/busqueda.png" alt="Diagrama de flujo para PS 3.36 - Inciso A" 
+                             onerror="this.parentElement.innerHTML ='<p class=\'placeholder\'>Aquí va la imagen del diagrama de flujo.</p>'">
+                    </div>
                 </div>
             </div>
-            <a href="index.html" class="back-link">← Volver al Inicio</a>
         </main>
     </div>
 
@@ -104,6 +119,14 @@
         function mostrarTerminal() {
             const terminal = document.getElementById('terminal-output');
             terminal.classList.toggle('visible');
+        }
+        
+        function toggleDiagram(button) {
+            const diagramContent = button.nextElementSibling;
+            button.classList.toggle('collapsed');
+            button.classList.toggle('expanded');
+            diagramContent.classList.toggle('visible');
+            button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
         }
     </script>
 </body>

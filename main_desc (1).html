@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ejercicios de OOP en Python</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Ejercicios de Programación Orientada a Objetos en Python</h1>
+      <p class="subtitle">Selecciona un ejercicio del menú para ver los detalles.</p>
+    </header>
+
+    <nav class="exercises-nav" aria-label="Navegación de ejercicios">
+      <a href="#employee" class="nav-link">Employee & Meeting</a>
+      <a href="#person" class="nav-link">Person</a>
+      <a href="#point2d" class="nav-link">Point2D</a>
+      <a href="#time" class="nav-link">Time</a>
+      <a href="#freqtable" class="nav-link">FreqTable</a>
+    </nav>
+
+    <main class="exercises-main">
+      <!-- Employee & Meeting -->
+      <article id="employee" class="exercise-card" aria-labelledby="employee-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="employee-title">Implementar <code>Employee</code> y <code>Meeting</code> con dunder methods</h2>
+          
+          <p class="exercise-description">
+            En este ejercicio aprenderás a implementar métodos especiales (dunder methods) que permiten 
+            personalizar el comportamiento de tus objetos. Practicarás la sobrecarga de operadores con 
+            <code>+</code> y <code>+=</code>, además de controlar cómo se representan tus objetos en texto 
+            con <code>__str__</code> y <code>__repr__</code>.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Crear una clase <code>Employee</code> con atributos <code>id</code> y <code>name</code>.</li>
+              <li>Implementar métodos:
+                <ul>
+                  <li><code>__str__</code>: representación legible para el usuario, por ejemplo <code>"{self.name} con id = {self.id}"</code>.</li>
+                  <li><code>__repr__</code>: representación técnica para debugging, por ejemplo <code>"&lt;Employee name={self.name} id={self.id}&gt;"</code>.</li>
+                </ul>
+              </li>
+              <li>Crear una clase <code>Meeting</code> con atributo <code>attendees</code> (lista).</li>
+              <li>Implementar métodos:
+                <ul>
+                  <li><code>__add__</code>: operar con <code>+</code> para:
+                    <ul>
+                      <li><em>Meeting + Employee</em>: devolver un <strong>nuevo</strong> Meeting con los asistentes combinados (NO mutar el original).</li>
+                      <li><em>Meeting + Meeting</em>: devolver un <strong>nuevo</strong> Meeting con la unión de asistentes sin duplicados.</li>
+                      <li>Lanzar <code>raise TypeError("Solo se pueden agregar objetos de la clase Employee o Meeting")</code> si el objeto no es <code>Employee</code> ni <code>Meeting</code>.</li>
+                    </ul>
+                  </li>
+                  <li><code>__iadd__</code> (<code>+=</code>): agregar in-place un <code>Employee</code> o un <code>Meeting</code> (sin duplicar asistentes).</li>
+                  <li><code>__len__</code>: devolver el número de asistentes.</li>
+                  <li><code>__str__</code>: representación legible para el usuario con nombres separados por espacios. <code>Asistentes: Hugo, Paco, Luis</code></li>
+                  <li><code>__repr__</code>: representación técnica (por ejemplo <code>"0x7f3f4c5d6f70"</code>).</li>
+                </ul>
+              </li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block"># Crear empleados
+e1 = Employee("Hugo")
+e2 = Employee("Paco")
+e3 = Employee("Luis")
+
+# Crear meetings
+m1 = Meeting()
+m2 = Meeting()
+
+# Meeting + Employee -> nuevo meeting
+m3 = m1 + e1      # m1 no cambia, m3 contiene a Hugo
+
+# In-place +=
+m3 += e2          # m3 ahora: Hugo, Paco
+
+# Fusionar meetings sin mutar los originales
+m2 += e3
+m4 = m3 + m2      # m4: Hugo, Paco, Luis
+
+print(m4)         # Asistentes: Hugo Paco Luis
+print(len(m4))    # 3</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Asegúrate de:</p>
+            <ul>
+              <li>Usar <code>list.copy()</code> para evitar compartir referencias.</li>
+              <li>No duplicar asistentes al fusionar meetings.</li>
+              <li>Que <code>__str__</code> y <code>__repr__</code> devuelvan exactamente el formato solicitado.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> para comprobar los objetos en memoria usa <code>id(obj)</code> y para convertir la referencia a memoria en hexadecimal usa <code>hex(id(obj))</code>.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Person -->
+      <article id="person" class="exercise-card" aria-labelledby="person-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="person-title">Implementar <code>Person</code> con <code>__str__</code></h2>
+
+          <p class="exercise-description">
+            En este ejercicio reforzarás la comprensión del método especial <code>__str__</code>, que define cómo se 
+            muestran tus objetos al convertirlos en texto. Practicarás la manipulación de cadenas y el formateo de 
+            nombres propios, asegurando una salida legible y coherente para el usuario.
+          </p>
+          
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Crear una clase <code>Person</code> con atributos:
+                <ul>
+                  <li><code>first_name</code> (nombre)</li>
+                  <li><code>last_name</code> (apellido)</li>
+                </ul>
+              </li>
+              <li>Implementar el método:
+                <ul>
+                  <li><code>__str__</code>: debe devolver el nombre completo en formato capitalizado (primera letra mayúscula). Ejemplo: <code>"Juan Pérez"</code>.</li>
+                </ul>
+              </li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block"># Crear personas
+p1 = Person("juan", "perez")
+p2 = Person("maria", "lopez")
+
+print(p1)   # Juan Perez
+print(p2)   # Maria Lopez</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <ul>
+              <li>Recuerda que <code>str.title()</code> convierte la primera letra de cada palabra a mayúscula.</li>
+              <li>El método <code>__str__</code> debe devolver exactamente el formato pedido.</li>
+              <li>Este método se ejecuta automáticamente al usar <code>print(objeto)</code>.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> prueba crear varias personas con nombres en minúscula y verifica que al imprimirlos aparezcan correctamente capitalizados.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Point2D -->
+      <article id="point2d" class="exercise-card" aria-labelledby="point2d-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="point2d-title">Clase <code>Point2D</code> con cálculo de distancias</h2>
+
+          <p class="exercise-description">
+            En este ejercicio aplicarás conceptos de programación orientada a objetos y matemáticas básicas para 
+            modelar puntos en un plano cartesiano. Implementarás un método que calcule la distancia entre dos puntos 
+            usando la fórmula euclidiana, reforzando el uso de métodos con parámetros y del módulo <code>math</code>.
+          </p>
+          
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Crear una clase <code>Point2D</code> con atributos:
+                <ul>
+                  <li><code>x</code> (coordenada en el eje X)</li>
+                  <li><code>y</code> (coordenada en el eje Y)</li>
+                </ul>
+              </li>
+              <li>Implementar el método:
+                <ul>
+                  <li><code>calculate_distance(self, other)</code>: debe devolver la distancia euclidiana entre el punto actual y otro punto.</li>
+                </ul>
+              </li>
+              <li>Usar el módulo <code>math</code> para calcular la raíz cuadrada.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">p1 = Point2D(0, 0)
+p2 = Point2D(3, 4)
+print(p1.calculate_distance(p2))   # 5.0</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <ul>
+              <li>La fórmula es: √((x1-x2)² + (y1-y2)²).</li>
+              <li>Usa <code>math.sqrt()</code> para la raíz cuadrada.</li>
+            </ul>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Time -->
+      <article id="time" class="exercise-card" aria-labelledby="time-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="time-title">Clase <code>Time</code> con <code>__str__</code> y total en segundos</h2>
+
+          <p class="exercise-description">
+            En este ejercicio aprenderás a representar objetos que modelan el tiempo y a convertirlos en diferentes 
+            formatos. Implementarás un método para mostrar la hora en formato <code>hh:mm:ss</code> y otro para calcular 
+            el total de segundos, combinando aritmética básica con formateo de cadenas en Python.
+          </p>
+          
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Clase <code>Time</code> con atributos <code>hour</code>, <code>minute</code>, <code>second</code>.</li>
+              <li>Método <code>total_seconds()</code>: convierte a segundos totales.</li>
+              <li>Método <code>__str__</code>: devuelve formato <code>hh:mm:ss</code> con ceros a la izquierda.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">t = Time(1, 5, 9)
+print(t)             # 01:05:09
+print(t.total_seconds())  # 3909</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <ul>
+              <li>Usa <code>str.zfill(2)</code> o condiciones para ceros.</li>
+              <li><code>__str__</code> recorre <code>self.__dict__</code> para armar la cadena.</li>
+            </ul>
+          </aside>
+        </div>
+      </article>
+
+      <!-- FreqTable -->
+      <article id="freqtable" class="exercise-card" aria-labelledby="freqtable-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="freqtable-title">Clase <code>FreqTable</code> para contar elementos</h2>
+
+          <p class="exercise-description">
+            En este ejercicio practicarás el uso de diccionarios para contar ocurrencias de elementos. Crearás una clase 
+            que funcione como una tabla de frecuencias, capaz de registrar, incrementar y consultar valores de manera 
+            eficiente, reforzando el manejo de estructuras de datos mutables.
+          </p>
+          
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Crear clase <code>FreqTable</code> con atributo <code>count</code> (diccionario vacío).</li>
+              <li>Método <code>add(element)</code>: incrementa la frecuencia de un elemento.</li>
+              <li>Método <code>get_count(element)</code>: devuelve la frecuencia (o 0 si no existe).</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">f = FreqTable()
+f.add("apple")
+f.add("apple")
+f.add("banana")
+
+print(f.get_count("apple"))   # 2
+print(f.get_count("banana"))  # 1
+print(f.get_count("pear"))    # 0</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <ul>
+              <li>El atributo <code>count</code> debe ser un diccionario.</li>
+              <li>El método <code>get_count</code> debe devolver 0 si el elemento no existe.</li>
+            </ul>
+          </aside>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <p class="note-text">Regresa al <a href="#top">menú</a> para elegir otro ejercicio.</p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -60,8 +60,8 @@
           <h2 id="llamada-title">Sistema de cálculo de costo de llamadas telefónicas</h2>
           
           <p class="exercise-description">
-            Una compañía telefónica cobra diferente según la distancia de la llamada.
-            El costo varía también según si es local, nacional o internacional.
+            Una compañía telefónica cobra diferente según la zona o región a la que se realiza la llamada.
+            El costo depende de una clave de zona y de la duración de la llamada en minutos.
           </p>
         </header>
         
@@ -71,48 +71,57 @@
             <ul>
               <li>Leer:
                 <ul>
-                  <li>Tipo de llamada (1=Local, 2=Nacional, 3=Internacional)</li>
+                  <li>Clave de zona (12, 15, 18, 19, 25 o 29)</li>
                   <li>Duración en minutos</li>
-                  <li>Distancia en km (para nacionales e internacionales)</li>
                 </ul>
               </li>
-              <li>Aplicar tarifas:
+              <li>Zonas disponibles con tarifas (precio base para primeros 3 minutos, precio extra para minutos adicionales):
                 <ul>
-                  <li><strong>Local</strong>: $0.50 por minuto</li>
-                  <li><strong>Nacional</strong>: $0.80 por minuto + $0.05 por km</li>
-                  <li><strong>Internacional</strong>: $1.50 por minuto + $0.10 por km</li>
+                  <li><strong>12 - Norte</strong>: $2.00 base, $1.50 extra</li>
+                  <li><strong>15 - Central</strong>: $2.20 base, $1.80 extra</li>
+                  <li><strong>18 - Sur</strong>: $4.50 base, $3.50 extra</li>
+                  <li><strong>19 - Europa</strong>: $3.50 base, $2.70 extra</li>
+                  <li><strong>25 - Asia y África</strong>: $6.00 base, $4.60 extra</li>
+                  <li><strong>29 - Oceanía</strong>: $5.00 base, $3.90 extra</li>
                 </ul>
               </li>
-              <li>Calcular el costo total.</li>
-              <li>Mostrar el desglose del costo.</li>
-              <li>Permitir múltiples cálculos.</li>
+              <li>Calcular costo: primeros 3 minutos aplica precio base, minutos adicionales aplican precio extra.</li>
+              <li>Validar que la clave de zona sea válida.</li>
+              <li>Mostrar el costo total de la llamada.</li>
             </ul>
             
             <h3>Ejemplo de uso esperado</h3>
-            <pre><code class="code-block">COSTO DE LLAMADAS TELEFÓNICAS
+            <pre><code class="code-block">=== OPCIONES DE ZONAS ===
+12 - Norte
+15 - Central
+18 - Sur
+19 - Europa
+25 - Asia y África
+29 - Oceanía
+========================
 
-Tipo (1=Local, 2=Nacional, 3=Internacional): 2
-Duración (minutos): 30
-Distancia (km): 500
+Ingresa la clave de la zona: 18
+Ingresa los minutos de la llamada: 8
 
-Desglose:
-- Minutos: 30 × $0.80 = $24.00
-- Distancia: 500 × $0.05 = $25.00
-TOTAL: $49.00</code></pre>
+Cálculo:
+- Primeros 3 minutos: 3 × $4.50 = $13.50
+- 5 minutos adicionales: 5 × $3.50 = $17.50
+El costo de la llamada es: $31.00</code></pre>
           </section>
           
           <aside class="exercise-sidebar">
             <h3>Notas rápidas</h3>
             <p class="note-text">Recuerda que:</p>
             <ul>
-              <li>Usa sentencias if/else para los tipos de llamada.</li>
-              <li>Calcula por separado minutos y distancia.</li>
-              <li>Valida que los datos sean válidos.</li>
-              <li>Formatea moneda con 2 decimales.</li>
+              <li>Usa if/else o switch para validar la clave de zona.</li>
+              <li>Asigna dos precios por zona: base y extra.</li>
+              <li>Los primeros 3 minutos siempre usan el precio base.</li>
+              <li>Los minutos después del 3ero usan el precio extra.</li>
+              <li>Valida que la clave ingresada sea válida.</li>
             </ul>
             
             <div class="tip-box">
-              <strong>Tip:</strong> primero resuelve solo para un tipo de llamada.
+              <strong>Tip:</strong> prueba con diferentes zonas y duraciones.
             </div>
           </aside>
         </div>

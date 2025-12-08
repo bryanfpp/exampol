@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Búsqueda en Arreglo</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Búsqueda en Arreglo</h1>
+      <p class="subtitle">Implementa algoritmos de búsqueda lineal y binaria.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Búsqueda en Arreglo -->
+      <article class="exercise-card" aria-labelledby="busqueda-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Problem Set 4.8</span>
+          <h2 id="busqueda-title">Algoritmos de búsqueda: Lineal y Binaria</h2>
+          
+          <p class="exercise-description">
+            Implementa dos algoritmos fundamentales de búsqueda: la búsqueda lineal (simple)
+            y la búsqueda binaria (eficiente en arreglos ordenados).
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Leer un arreglo de números enteros.</li>
+              <li>Leer el número a buscar.</li>
+              <li>Implementar <strong>búsqueda lineal</strong>:
+                <ul>
+                  <li>Recorre el arreglo de inicio a fin</li>
+                  <li>Retorna la posición si encuentra el número</li>
+                </ul>
+              </li>
+              <li>Implementar <strong>búsqueda binaria</strong>:
+                <ul>
+                  <li>Requiere arreglo ordenado</li>
+                  <li>Divide el espacio de búsqueda a la mitad</li>
+                </ul>
+              </li>
+              <li>Comparar el número de comparaciones realizadas.</li>
+              <li>Mostrar la posición encontrada o mensaje de no encontrado.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">Arreglo: [2, 5, 8, 12, 15, 20, 25, 30]
+Buscar: 15
+
+Búsqueda Lineal:
+Comparaciones: 5
+Posición: 4 ✓ encontrado
+
+Búsqueda Binaria:
+Comparaciones: 3
+Posición: 4 ✓ encontrado</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>Búsqueda lineal: O(n), funciona en cualquier arreglo</li>
+              <li>Búsqueda binaria: O(log n), requiere arreglo ordenado</li>
+              <li>Usa contadores para comparaciones realizadas</li>
+              <li>Índices suelen empezar en 0</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> prueba ambos algoritmos en el mismo arreglo.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/busqueda.png" alt="Diagrama de flujo para Búsqueda" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

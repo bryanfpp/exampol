@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Temperaturas 3D</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Temperaturas 3D</h1>
+      <p class="subtitle">Procesa datos de temperatura en una matriz tridimensional.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Temperaturas 3D -->
+      <article class="exercise-card" aria-labelledby="temp-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="temp-title">Lectura y procesamiento de temperaturas en matriz 3D</h2>
+          
+          <p class="exercise-description">
+            En este ejercicio aprenderás a trabajar con arreglos multidimensionales (3D).
+            Procesarás datos de temperaturas organizados por ubicación, día y hora.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Crear una matriz 3D de temperaturas: <code>[ubicaciones][días][horas]</code></li>
+              <li>Leer datos de temperatura para cada ubicación, día y hora.</li>
+              <li>Calcular:
+                <ul>
+                  <li>Temperatura promedio por ubicación</li>
+                  <li>Temperatura máxima en toda la matriz</li>
+                  <li>Temperatura mínima en toda la matriz</li>
+                </ul>
+              </li>
+              <li>Mostrar los resultados de forma clara y organizada.</li>
+              <li>Validar que las temperaturas estén en un rango válido (ej: -50 a 50).</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">Dimensiones: 2 ubicaciones, 3 días, 4 horas
+
+Ingrese temperaturas [ubicación][día][hora]:
+[0][0][0]: 18.5
+[0][0][1]: 19.2
+...
+
+Promedio por ubicación:
+Ubicación 0: 20.5°C
+Ubicación 1: 18.3°C
+
+Máxima: 28.5°C
+Mínima: 12.1°C</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>Las matrices 3D usan tres índices: [i][j][k]</li>
+              <li>Necesitarás tres ciclos anidados para recorrerla.</li>
+              <li>Los acumuladores deben inicializarse antes de usarlos.</li>
+              <li>Para máximos y mínimos, usa operadores condicionales.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> comienza con dimensiones pequeñas (2x2x2) para probar tu lógica.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/temperaturas.png" alt="Diagrama de flujo para Temperaturas 3D" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

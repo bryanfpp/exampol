@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Costo de Llamada</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Costo de Llamada</h1>
+      <p class="subtitle">Calcula el costo de llamadas telefónicas según distancia y duración.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Costo de Llamada -->
+      <article class="exercise-card" aria-labelledby="llamada-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Problem Set 2.18</span>
+          <h2 id="llamada-title">Sistema de cálculo de costo de llamadas telefónicas</h2>
+          
+          <p class="exercise-description">
+            Una compañía telefónica cobra diferente según la distancia de la llamada.
+            El costo varía también según si es local, nacional o internacional.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Leer:
+                <ul>
+                  <li>Tipo de llamada (1=Local, 2=Nacional, 3=Internacional)</li>
+                  <li>Duración en minutos</li>
+                  <li>Distancia en km (para nacionales e internacionales)</li>
+                </ul>
+              </li>
+              <li>Aplicar tarifas:
+                <ul>
+                  <li><strong>Local</strong>: $0.50 por minuto</li>
+                  <li><strong>Nacional</strong>: $0.80 por minuto + $0.05 por km</li>
+                  <li><strong>Internacional</strong>: $1.50 por minuto + $0.10 por km</li>
+                </ul>
+              </li>
+              <li>Calcular el costo total.</li>
+              <li>Mostrar el desglose del costo.</li>
+              <li>Permitir múltiples cálculos.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">COSTO DE LLAMADAS TELEFÓNICAS
+
+Tipo (1=Local, 2=Nacional, 3=Internacional): 2
+Duración (minutos): 30
+Distancia (km): 500
+
+Desglose:
+- Minutos: 30 × $0.80 = $24.00
+- Distancia: 500 × $0.05 = $25.00
+TOTAL: $49.00</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>Usa sentencias if/else para los tipos de llamada.</li>
+              <li>Calcula por separado minutos y distancia.</li>
+              <li>Valida que los datos sean válidos.</li>
+              <li>Formatea moneda con 2 decimales.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> primero resuelve solo para un tipo de llamada.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/llamadas.png" alt="Diagrama de flujo para Costo de Llamada" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Números Perfectos</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Números Perfectos</h1>
+      <p class="subtitle">Identifica y clasifica números perfectos en un rango.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Números Perfectos -->
+      <article class="exercise-card" aria-labelledby="perfectos-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="perfectos-title">Búsqueda y clasificación de números perfectos</h2>
+          
+          <p class="exercise-description">
+            Un número perfecto es aquel cuya suma de divisores propios (menores que el número)
+            es igual al número mismo. Ej: 6 = 1 + 2 + 3. En este ejercicio, encuentra todos
+            los números perfectos en un rango dado.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Leer un rango de números: <code>inicio</code> y <code>fin</code>.</li>
+              <li>Para cada número en el rango:
+                <ul>
+                  <li>Calcular la suma de sus divisores propios.</li>
+                  <li>Verificar si la suma es igual al número (número perfecto).</li>
+                </ul>
+              </li>
+              <li>Mostrar todos los números perfectos encontrados.</li>
+              <li>Mostrar los divisores de cada número perfecto encontrado.</li>
+              <li>Contar la cantidad total de números perfectos en el rango.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">Ingrese inicio del rango: 1
+Ingrese fin del rango: 30
+
+Números perfectos encontrados:
+- 6: 1 + 2 + 3 = 6
+- 28: 1 + 2 + 4 + 7 + 14 = 28
+
+Total: 2 números perfectos</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>Los divisores propios no incluyen el número mismo.</li>
+              <li>Los números perfectos son muy raros (próximo es 496).</li>
+              <li>Usa un ciclo para encontrar divisores (hasta n/2).</li>
+              <li>Un acumulador para la suma de divisores.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> verifica manualmente que 6 y 28 son perfectos.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/numerosperfectos.png" alt="Diagrama de flujo para Números Perfectos" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Granja Producción</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Granja Producción</h1>
+      <p class="subtitle">Gestiona la producción y estadísticas de una granja.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Granja Producción -->
+      <article class="exercise-card" aria-labelledby="granja-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Problem Set 3.36</span>
+          <h2 id="granja-title">Análisis de producción agrícola en una granja</h2>
+          
+          <p class="exercise-description">
+            Una granja registra su producción de cultivos durante varios meses.
+            Se necesita un programa que analice los datos y genere estadísticas.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Registrar producción de 3 cultivos durante 12 meses (matriz 3x12).</li>
+              <li>Leer datos de producción mensuales por cultivo.</li>
+              <li>Calcular:
+                <ul>
+                  <li>Producción total por cultivo</li>
+                  <li>Producción promedio por cultivo</li>
+                  <li>Producción total de la granja</li>
+                  <li>Mes con mayor producción</li>
+                  <li>Cultivo con mayor producción</li>
+                </ul>
+              </li>
+              <li>Mostrar un resumen organizado de estadísticas.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">PRODUCCIÓN AGRÍCOLA - 3 CULTIVOS × 12 MESES
+
+Cultivo 1 - Maíz
+Enero: 1200, Febrero: 1500, ...
+
+ESTADÍSTICAS:
+Cultivo 1 (Maíz): Total 15,600 kg | Promedio 1,300 kg/mes
+Cultivo 2 (Trigo): Total 12,400 kg | Promedio 1,033 kg/mes
+Cultivo 3 (Cebada): Total 11,800 kg | Promedio 983 kg/mes
+
+Producción Total: 39,800 kg
+Mayor Producción: Octubre (5,200 kg)
+Mejor Cultivo: Maíz (15,600 kg)</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>Usa una matriz [cultivos][meses] para los datos.</li>
+              <li>Tres ciclos anidados para leer todos los datos.</li>
+              <li>Acumuladores para totales y promedios.</li>
+              <li>Condicionales para encontrar máximos.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> organiza los nombres de cultivos en un arreglo.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/granja.png" alt="Diagrama de flujo para Granja Producción" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

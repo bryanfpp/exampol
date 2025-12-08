@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inmobiliaria</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Inmobiliaria</h1>
+      <p class="subtitle">Sistema de gestión de propiedades inmobiliarias.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Inmobiliaria -->
+      <article class="exercise-card" aria-labelledby="inmobiliaria-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Problem Set 5.3</span>
+          <h2 id="inmobiliaria-title">Sistema de gestión de propiedades para una inmobiliaria</h2>
+          
+          <p class="exercise-description">
+            Una inmobiliaria necesita un sistema para registrar, buscar y analizar
+            información de propiedades (casas, apartamentos, terrenos, etc.).
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Crear un sistema que registre propiedades con:
+                <ul>
+                  <li>ID (único)</li>
+                  <li>Tipo (casa, apartamento, terreno)</li>
+                  <li>Dirección</li>
+                  <li>Área (m²)</li>
+                  <li>Precio</li>
+                  <li>Estado (disponible, vendida, alquilada)</li>
+                </ul>
+              </li>
+              <li>Funcionalidades:
+                <ul>
+                  <li>Agregar nuevas propiedades</li>
+                  <li>Buscar por tipo o rango de precio</li>
+                  <li>Listar propiedades disponibles</li>
+                  <li>Calcular precio promedio por tipo</li>
+                  <li>Calcular área promedio por tipo</li>
+                </ul>
+              </li>
+              <li>Mostrar reportes de propiedades disponibles.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">SISTEMA INMOBILIARIO
+
+MENU:
+1. Agregar propiedad
+2. Buscar por rango de precio
+3. Listar disponibles
+4. Reportes
+5. Salir
+
+Opción: 3
+
+PROPIEDADES DISPONIBLES:
+ID-001 Casa - 150 m² - $450,000
+ID-003 Apartamento - 85 m² - $280,000
+ID-005 Terreno - 500 m² - $120,000
+
+Total: 3 propiedades disponibles</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>Usa arreglos para almacenar datos de propiedades</li>
+              <li>O mejor: crear una estructura/clase por propiedad</li>
+              <li>Búsqueda lineal para encontrar propiedades</li>
+              <li>Acumuladores para promedios por tipo</li>
+              <li>Menú interactivo con validación de opciones</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> empieza con 5-10 propiedades predefinidas.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/inmobilaria.png" alt="Diagrama de flujo para Inmobiliaria" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

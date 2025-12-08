@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inserción Directa</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Inserción Directa</h1>
+      <p class="subtitle">Implementa el algoritmo de ordenamiento por inserción directa.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Inserción Directa -->
+      <article class="exercise-card" aria-labelledby="insercion-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="insercion-title">Algoritmo de Ordenamiento por Inserción Directa</h2>
+          
+          <p class="exercise-description">
+            Implementa uno de los algoritmos de ordenamiento más eficientes para listas pequeñas.
+            El ordenamiento por inserción directa simula la forma en que ordenamos una mano de naipes.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Leer <code>n</code> números enteros en un arreglo.</li>
+              <li>Implementar el algoritmo de inserción directa que:
+                <ul>
+                  <li>Considera el primer elemento como ya ordenado.</li>
+                  <li>Para cada elemento siguiente, lo inserta en la posición correcta.</li>
+                  <li>Desplaza los elementos mayores hacia la derecha.</li>
+                </ul>
+              </li>
+              <li>Mostrar el arreglo en cada paso del ordenamiento.</li>
+              <li>Mostrar el arreglo final ordenado.</li>
+              <li>Contar el número total de comparaciones y desplazamientos realizados.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">Ingrese cantidad de elementos: 5
+Elementos: 5 2 8 1 9
+
+Paso 0: [5]
+Paso 1: [2, 5]
+Paso 2: [2, 5, 8]
+Paso 3: [1, 2, 5, 8]
+Paso 4: [1, 2, 5, 8, 9]
+
+Comparaciones: 10
+Desplazamientos: 7</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>El primer elemento siempre está ordenado.</li>
+              <li>Usamos un ciclo desde i=1 hasta n-1.</li>
+              <li>Un ciclo interno desplaza elementos mayores.</li>
+              <li>La complejidad es O(n²) en el peor caso.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> dibuja los pasos manualmente con 5 números antes de codificar.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/inserciondirecta.png" alt="Diagrama de flujo para Inserción Directa" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tiros (Triadas Pitagóricas)</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Tiros (Triadas Pitagóricas)</h1>
+      <p class="subtitle">Encuentra triadas pitagóricas en un rango dado.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Tiros Pitagóricos -->
+      <article class="exercise-card" aria-labelledby="tiros-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Problem Set 3.35</span>
+          <h2 id="tiros-title">Búsqueda de triadas pitagóricas (Pythagorean Triples)</h2>
+          
+          <p class="exercise-description">
+            Una triada pitagórica es un conjunto de tres números positivos a, b, c
+            que satisfacen: a² + b² = c². Ejemplo: 3, 4, 5 porque 9 + 16 = 25.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Leer el rango máximo N (buscar triadas donde c ≤ N).</li>
+              <li>Encontrar todos los triplos (a, b, c) donde:
+                <ul>
+                  <li>1 ≤ a ≤ b ≤ c ≤ N</li>
+                  <li>a² + b² = c²</li>
+                </ul>
+              </li>
+              <li>Mostrar cada triada con su verificación matemática.</li>
+              <li>Contar el total de triadas encontradas.</li>
+              <li>Optimizar: usar tres ciclos anidados o cálculo de c.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">Ingrese N (límite superior): 50
+
+Triadas Pitagóricas encontradas:
+(3, 4, 5) - 3² + 4² = 9 + 16 = 25 = 5²
+(5, 12, 13) - 5² + 12² = 25 + 144 = 169 = 13²
+(8, 15, 17) - 8² + 15² = 64 + 225 = 289 = 17²
+(7, 24, 25) - 7² + 24² = 49 + 576 = 625 = 25²
+...
+Total: 4 triadas encontradas</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>Usa Math.sqrt() para calcular la raíz cuadrada de c.</li>
+              <li>Verifica si c es un número entero perfecto.</li>
+              <li>Para evitar duplicados, haz a ≤ b.</li>
+              <li>Optimización: calcula c² y verifica si es entero.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> la triada (3, 4, 5) es la más famosa.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/TIROS.png" alt="Diagrama de flujo para Tiros Pitagóricos" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Casa de Cambio</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Casa de Cambio</h1>
+      <p class="subtitle">Calcula conversiones de monedas con tasas de cambio.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Casa de Cambio -->
+      <article class="exercise-card" aria-labelledby="cambio-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Problem Set 1.3</span>
+          <h2 id="cambio-title">Conversión de monedas en una casa de cambio</h2>
+          
+          <p class="exercise-description">
+            En una casa de cambio se necesita un programa que convierta dinero de una moneda
+            a otra utilizando tasas de cambio. El programa debe permitir múltiples conversiones.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Definir tasas de cambio para diferentes monedas (USD, EUR, MXN, etc.).</li>
+              <li>Leer:
+                <ul>
+                  <li>La moneda origen</li>
+                  <li>La moneda destino</li>
+                  <li>La cantidad a cambiar</li>
+                </ul>
+              </li>
+              <li>Calcular la cantidad equivalente en la moneda destino.</li>
+              <li>Mostrar el resultado con dos decimales.</li>
+              <li>Permitir múltiples conversiones hasta que el usuario lo desee.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">CASA DE CAMBIO
+
+Monedas disponibles: USD, EUR, MXN, GBP
+
+¿De qué moneda? USD
+¿A qué moneda? MXN
+¿Cuánto? 100
+100 USD = 1700.50 MXN
+
+¿Otra conversión? S/N</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>Las tasas pueden guardarse en un arreglo o diccionario.</li>
+              <li>Usa una variable de control para el ciclo de conversiones.</li>
+              <li>Valida que las monedas existan en el sistema.</li>
+              <li>Formatea el resultado a 2 decimales.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> define tasas de cambio realistas o ficticias coherentes.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/casadecambio.png" alt="Diagrama de flujo para Casa de Cambio" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>

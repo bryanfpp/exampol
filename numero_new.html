@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Par, Impar o Nulo</title>
+  <link rel="stylesheet" href="./styles/styles_desc.css">
+  <style>
+    .btn-toggle-diagram {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle-diagram:hover {
+      background-color: #0059a3;
+      opacity: 0.9;
+    }
+
+    .btn-toggle-diagram.collapsed::before {
+      content: "▶ ";
+    }
+
+    .btn-toggle-diagram.expanded::before {
+      content: "▼ ";
+    }
+
+    .diagram-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .diagram-content.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Par, Impar o Nulo</h1>
+      <p class="subtitle">Determina si un número entero es par, impar o igual a cero.</p>
+    </header>
+
+    <main class="exercises-main">
+      <!-- Par, Impar o Nulo -->
+      <article class="exercise-card" aria-labelledby="paridad-title">
+        <header class="exercise-header">
+          <span class="exercise-badge">Ejercicio</span>
+          <h2 id="paridad-title">Evaluación de paridad con <code>Math.pow(-1, A)</code></h2>
+          
+          <p class="exercise-description">
+            En este ejercicio aprenderás a implementar una estructura condicional anidada para evaluar 
+            si un número entero es par, impar o nulo (cero). Practicarás el uso de múltiples condiciones 
+            y una técnica matemática interesante para determinar la paridad utilizando potencias.
+          </p>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <h3>Requisitos</h3>
+            <ul>
+              <li>Crear un programa que lea un número entero <code>A</code>.</li>
+              <li>Implementar una estructura condicional <code>if-else if-else</code> para evaluar:
+                <ul>
+                  <li>Si <code>A == 0</code> → mostrar "Nulo".</li>
+                  <li>Si <code>Math.pow(-1, A) > 0</code> → el número es <strong>Par</strong>.</li>
+                  <li>Si <code>Math.pow(-1, A) < 0</code> → el número es <strong>Impar</strong>.</li>
+                </ul>
+              </li>
+              <li>Validar el funcionamiento con números positivos y negativos.</li>
+              <li>La clase principal debe llamarse <code>Numero.java</code>.</li>
+            </ul>
+            
+            <h3>Ejemplo de uso esperado</h3>
+            <pre><code class="code-block">Ingrese un número: 0
+Nulo
+
+Ingrese un número: 4
+Par
+
+Ingrese un número: -7
+Impar
+
+Ingrese un número: 12
+Par</code></pre>
+          </section>
+          
+          <aside class="exercise-sidebar">
+            <h3>Notas rápidas</h3>
+            <p class="note-text">Recuerda que:</p>
+            <ul>
+              <li>La primera condición debe validar si <code>A == 0</code>.</li>
+              <li><code>Math.pow(-1, A)</code> devuelve 1 si A es par, -1 si es impar.</li>
+              <li>Prueba con valores positivos, negativos y cero.</li>
+              <li>El orden de las condiciones es importante.</li>
+            </ul>
+            
+            <div class="tip-box">
+              <strong>Tip:</strong> usa paréntesis para claridad en las condiciones complejas: 
+              <code>if ((resultado = Math.pow(-1, A)) > 0)</code>.
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <!-- Diagrama de Flujo -->
+      <article class="exercise-card">
+        <header class="exercise-header">
+          <h2>📊 Diagrama de Flujo</h2>
+        </header>
+        
+        <div class="exercise-content">
+          <section class="exercise-main">
+            <button class="btn-toggle-diagram collapsed" onclick="toggleDiagram(this)">Mostrar Diagrama</button>
+            <div class="diagram-content">
+              <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; border-radius: 8px; background: #f9f9f9;">
+                <img src="./img/parimparnulo.png" alt="Diagrama de flujo para Par, Impar o Nulo" 
+                     onerror="this.parentElement.innerHTML = '<p style=\'color: #888; font-style: italic;\'>Imagen no disponible. Aquí va el diagrama de flujo.</p>';"
+                     style="max-width: 100%; height: auto;">
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function toggleDiagram(button) {
+      const diagramContent = button.nextElementSibling;
+      button.classList.toggle('collapsed');
+      button.classList.toggle('expanded');
+      diagramContent.classList.toggle('visible');
+      button.textContent = button.classList.contains('expanded') ? '▼ Ocultar Diagrama' : '▶ Mostrar Diagrama';
+    }
+  </script>
+</body>
+</html>
